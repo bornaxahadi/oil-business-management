@@ -10,8 +10,8 @@
  * Setup: see README.md (section "Gmail + phone notifications").
  */
 const SETTINGS = {
-  toEmail: 'petromadxb@gmail.com',   // every offer is sent here
-  ccEmail: 'ahadiborna@gmail.com',   // and copied here
+  toEmail: 'ahadiborna@gmail.com',   // every offer is sent here
+  ccEmail: '',
   ntfyTopic: 'CHOOSE-A-SECRET-NAME', // same name you subscribe to in the ntfy app
   folderName: 'Oil Offers',
   sheetName: 'Oil Offers — Inbox'
