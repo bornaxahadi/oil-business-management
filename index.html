@@ -273,6 +273,7 @@ const STAGES = [
   fields:[
    {id:'terms',label:'Delivery terms',type:'multi',options:INCOTERMS},
    {id:'prices',label:'Price for each term',type:'prices',showIf:s=>Array.isArray(s.terms)&&s.terms.length},
+   {id:'destination',label:'Destination port / country',hint:'where the cargo is delivered',type:'text',showIf:s=>Array.isArray(s.terms)&&s.terms.some(t=>['CIF','CFR','DAP'].includes(t))},
    {id:'currency',label:'Currency',type:'chips',options:['USD','EUR','AED'],noDK:true},
    {id:'per',label:'Price per',type:'chips',options:['MT','BBL','Litre','Gallon','CBM'],noDK:true},
    {id:'basis',label:'Price basis',type:'chips',options:['Fixed price','Platts minus discount','Platts plus premium','Negotiable']},
@@ -392,7 +393,7 @@ function drawQs(){
         <div class="chips mt8">${['MT','BBL','CBM','Litres','Gallons'].map(u=>`<button class="chip ${!unk&&q.u===u?'on':''}" data-qu="${f.id}" data-o="${u}">${u}</button>`).join('')}</div>`;
     } else if(f.type==='prices'){
       const p=A.prices||{};
-      body=`<div class="pricegrid">${A.terms.filter(t=>t!==DK).map(t=>`<div class="pricerow"><b>${t}</b><input inputmode="decimal" data-p="${t}" value="${esc(p[t])}" placeholder="${A.currency||'USD'} per ${A.per||'MT'}"></div>`).join('')||'<small class="hint">Pick a delivery term above.</small>'}</div>`;
+      body=`<div class="pricegrid">${A.terms.filter(t=>t!==DK).map(t=>`<div class="pricerow"><b>${esc(termName(t,A))}</b><input inputmode="decimal" data-p="${t}" value="${esc(p[t])}" placeholder="${A.currency||'USD'} per ${A.per||'MT'}"></div>`).join('')||'<small class="hint">Pick a delivery term above.</small>'}</div>`;
     } else if(f.type==='files'){
       body=`<label class="files">📎 Tap to attach files<small>Spec sheet, SGS, Q88, photos, PDF — max ~5 MB each</small><input type="file" id="fileIn" multiple hidden accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx,.xls,.xlsx"></label>
         <div class="flist">${S.files.map((x,i)=>`<div><span>${esc(x.name)}</span><small>${(x.size/1024/1024).toFixed(1)} MB</small><button data-rm="${i}" aria-label="Remove">✕</button></div>`).join('')}</div>`;
@@ -420,9 +421,10 @@ function drawQs(){
 }
 
 /* ---------------- formatting answers ---------------- */
+const termName=(t,A)=>t==='__other'?(A.terms_other||'Custom term'):t;
 function fmt(f,A){
   let v=A[f.id];
-  if(f.type==='prices'){ const p=A.prices||{}; const out=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`${t} ${A.currency||'USD'} ${p[t]}/${A.per||'MT'}`); return out.join(' · ')||''; }
+  if(f.type==='prices'){ const p=A.prices||{}; const out=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`${termName(t,A)} ${A.currency||'USD'} ${p[t]}/${A.per||'MT'}`); return out.join(' · ')||''; }
   if(v==='__other') return A[f.id+'_other']||'';
   if(Array.isArray(v)) return v.map(x=>x==='__other'?(A[f.id+'_other']||''):x).filter(Boolean).join(', ');
   if(v&&typeof v==='object') return v.n?`${v.n} ${v.u||''}`.trim():'';
