@@ -473,6 +473,7 @@ function drawQs(){
       else { arr=arr.filter(x=>x!==DK); arr = arr.includes(o)?arr.filter(x=>x!==o):[...arr,o]; }
       A[f.id]=arr;
     } else A[f.id] = A[f.id]===o ? '' : o;
+    if(f.id==='per') A._perSet=true;
     save(); drawQs();
   });
   box.querySelectorAll('[data-t]').forEach(i=>i.oninput=()=>{A[i.dataset.t]=i.value;save()});
@@ -486,7 +487,9 @@ function drawQs(){
     PROFILE={ans:{},logo:''}; try{localStorage.removeItem('oilProfile')}catch(e){} PKEYS.forEach(k=>delete A[k]); save(); try{localStorage.removeItem('oilProfile')}catch(e){} drawQs(); };
   box.querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>{const id=b.dataset.dk;A[id]=A[id]===DK?'':DK;save();drawQs()});
   box.querySelectorAll('[data-qn]').forEach(i=>i.oninput=()=>{const id=i.dataset.qn;const q=(A[id]&&typeof A[id]==='object')?A[id]:{u:'MT'};q.n=i.value;A[id]=q;save()});
-  box.querySelectorAll('[data-qu]').forEach(b=>b.onclick=()=>{const id=b.dataset.qu;const q=(A[id]&&typeof A[id]==='object')?A[id]:{n:''};q.u=b.dataset.o;A[id]=q;save();drawQs()});
+  box.querySelectorAll('[data-qu]').forEach(b=>b.onclick=()=>{const id=b.dataset.qu;const q=(A[id]&&typeof A[id]==='object')?A[id]:{n:''};q.u=b.dataset.o;A[id]=q;
+    if(!A._perSet){ const m={MT:'MT',BBL:'BBL',CBM:'CBM',Litres:'Litre',Gallons:'Gallon'}[q.u]; if(m) A.per=m; }
+    save();drawQs()});
   box.querySelectorAll('[data-p]').forEach(i=>i.oninput=()=>{A.prices=A.prices||{};A.prices[i.dataset.p]=i.value;save()});
   box.querySelectorAll('.fileIn').forEach(fi=>fi.onchange=()=>{ let skipped=0; for(const f of fi.files){ if(S.files.length>=MAXF){skipped++;continue} if(f.size>8*1024*1024){toast(`${f.name} is over 8 MB — send it by WhatsApp instead`);continue} S.files.push(f) } if(skipped) toast(`Maximum ${MAXF} files — ${skipped} not added`,3500); drawQs(); });
   box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{S.files.splice(+b.dataset.rm,1);drawQs()});
