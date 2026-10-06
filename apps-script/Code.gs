@@ -28,7 +28,24 @@ function setup() {
   notify_({product: 'Test notification', category: 'Setup complete'}, 'TEST', f.getUrl());
 }
 
-function doGet() { return out_({ok: true, service: 'oil offer receiver'}); }
+/** GET ?learned=1 → answers typed under "Custom" by at least LEARN_MIN different offers.
+ *  The app shows them as normal buttons. To remove one, delete its rows in the "New options" tab. */
+const LEARN_MIN = 2;
+function doGet(e) {
+  if (!(e && e.parameter && e.parameter.learned)) return out_({ok: true, service: 'oil offer receiver'});
+  const rows = newOptions_().getDataRange().getValues().slice(1);
+  const seen = {};
+  rows.forEach(r => {
+    const ref = r[1], key = String(r[5] || ''), val = String(r[4] || '').trim();
+    if (!key || !val || val.length > 60) return;
+    const id = key + '||' + val.toLowerCase();
+    (seen[id] = seen[id] || {key: key, val: val, refs: {}}).refs[ref] = 1;
+  });
+  const options = {};
+  Object.keys(seen).forEach(id => { const s = seen[id];
+    if (Object.keys(s.refs).length >= LEARN_MIN) (options[s.key] = options[s.key] || []).push(s.val); });
+  return out_({ok: true, options: options});
+}
 
 function doPost(e) {
   try {
@@ -53,7 +70,7 @@ function doPost(e) {
     if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email || '')) opts.replyTo = d.email;
     GmailApp.sendEmail(to, 'New oil offer ' + ref + ' — ' + (d.product || '') + (d.customs && d.customs.length ? ' ★ new options' : ''), d.text || '', opts);
 
-    if (d.customs && d.customs.length) newOptions_().appendRow([new Date(), ref, d.product, d.customs.map(c => c.q + ': ' + c.v).join(' | ')]);
+    (d.customs || []).forEach(c => newOptions_().appendRow([new Date(), ref, d.product, c.q, c.v, c.key || '']));
     notify_(d, ref, sub.getUrl());
     return out_({ok: true, ref: ref});
   } catch (err) {
@@ -89,8 +106,8 @@ function sheet_() {
 function newOptions_() {
   const ss = sheet_().getParent();
   return ss.getSheetByName('New options') || (() => {
-    const s = ss.insertSheet('New options'); s.appendRow(['Received', 'Ref', 'Product', 'Custom answers']);
-    s.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#F2C94C'); s.setFrozenRows(1); return s; })();
+    const s = ss.insertSheet('New options'); s.appendRow(['Received', 'Ref', 'Product', 'Question', 'Answer typed', 'Key']);
+    s.getRange(1, 1, 1, 6).setFontWeight('bold').setBackground('#F2C94C'); s.setFrozenRows(1); return s; })();
 }
 
 function notify_(d, ref, link) {

@@ -91,6 +91,9 @@ textarea.f{min-height:90px;resize:vertical}
 .pricerow b{width:62px;font-size:14px}
 .pricerow input{flex:1;border:0;background:#fff;border-radius:11px;padding:11px 12px;font-size:16px;font-weight:600;min-width:0}
 .files{border:2px dashed var(--line);border-radius:var(--r-md);padding:18px;text-align:center;display:block;font-weight:600}
+.perks{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
+.perks span{background:#fff;border-radius:99px;padding:7px 12px;font-size:13px;font-weight:600}
+.prices small{display:block;font-size:11px;font-weight:600;opacity:.8;max-width:260px;text-align:right;margin-top:2px}
 .fbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fbtns .files{padding:16px 8px;font-size:22px}
 .fbtns .files b{display:block;font-size:15px;margin-top:4px}
@@ -143,7 +146,7 @@ textarea.f{min-height:90px;resize:vertical}
 #sheet .sh-hero h2{font-size:40px;line-height:1;font-weight:800;margin:10px 0 6px}
 #sheet .sh-hero .tag{display:inline-block;background:#1B1B1B;color:#fff;font-size:12px;font-weight:600;padding:4px 11px;border-radius:99px}
 #sheet .sh-hero.dark .tag{background:#fff;color:#1B1B1B}
-#sheet .sh-hero .prices{margin-left:auto;display:grid;gap:6px;text-align:right}
+#sheet .sh-hero .prices{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
 #sheet .sh-hero .prices div{background:#fff;color:#1B1B1B;border-radius:99px;padding:7px 14px;font-weight:700;font-size:14px;white-space:nowrap}
 #sheet .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 #sheet .box{background:#fff;border-radius:20px;padding:16px 18px;break-inside:avoid}
@@ -314,6 +317,14 @@ let S = {cat:null, ans:{}, files:[]};
 let view = 'home', step = 0, ref = '';
 const $ = s=>document.querySelector(s);
 const MAXF = 6;
+let LEARNED = {}; try{ LEARNED = JSON.parse(localStorage.getItem('oilLearned')||'{}') }catch(e){}
+const lkey = (i,f) => (i===0?S.cat:'*')+'|'+f.id;
+const optsOf = (f,i) => { const extra=(LEARNED[lkey(i,f)]||[]).filter(o=>!f.options.some(x=>x.toLowerCase()===o.toLowerCase())); return f.options.concat(extra); };
+async function loadLearned(){
+  if(!CONFIG.scriptUrl) return;
+  try{ const r=await fetch(CONFIG.scriptUrl+'?learned=1'); const j=await r.json();
+    if(j&&j.ok&&j.options){ LEARNED=j.options; localStorage.setItem('oilLearned',JSON.stringify(LEARNED)); if(view==='form') render(); } }catch(e){}
+}
 const esc = v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const save=()=>{try{localStorage.setItem('oilOfferDraft',JSON.stringify({cat:S.cat,ans:S.ans}))}catch(e){}};
 const load=()=>{try{const d=JSON.parse(localStorage.getItem('oilOfferDraft')||'null');if(d&&d.cat){S.cat=d.cat;S.ans=d.ans||{}}}catch(e){}};
@@ -344,6 +355,7 @@ function renderHome(app){
    ${topbar(`<div class="mark">${drop}</div><div><h4>${esc(CONFIG.brandName)}</h4><small>Offer intake</small></div>`)}
    <h1 class="hero">NEW OIL<br>OFFER</h1>
    <p class="lede">Choose the product being offered. It takes about two minutes.</p>
+   <div class="perks"><span>✓ Mostly tick boxes</span><span>✓ "Don't know" is fine</span><span>✓ Attach PDF &amp; photos</span></div>
    ${draft?`<button class="sbtn" style="background:#fff;margin-bottom:14px" id="resume"><div>Continue draft<small>${esc(cat().name)} offer in progress</small></div><span class="go">${arrow}</span></button>`:''}
    <div class="stack">${CATS.map(c=>`<button class="cat ${c.dark?'dark':''} ${c.bg==='#FFFFFF'?'light':''}" data-c="${c.id}" style="background:${c.bg};color:${c.fg}">
      <span class="ic">${c.icon}</span><span><b>${c.name}</b><span class="sub">${c.sub}</span></span><span class="go">${arrow}</span></button>`).join('')}</div>
@@ -388,7 +400,7 @@ function drawQs(){
     if(f.type==='chips'||f.type==='multi'){
       const sel = f.type==='multi' ? (Array.isArray(v)?v:[]) : v;
       const on = o=> f.type==='multi' ? sel.includes(o) : sel===o;
-      body = `<div class="chips">${f.options.map(o=>`<button class="chip ${on(o)?'on':''}" data-f="${f.id}" data-o="${esc(o)}">${f.swatch?`<span class="sw" style="background:${SWATCH[o]||'#ccc'}"></span>`:''}${esc(o)}</button>`).join('')}
+      body = `<div class="chips">${optsOf(f,step).map(o=>`<button class="chip ${on(o)?'on':''}" data-f="${f.id}" data-o="${esc(o)}">${f.swatch?`<span class="sw" style="background:${SWATCH[o]||'#ccc'}"></span>`:''}${esc(o)}</button>`).join('')}
         ${hasOther(f)?`<button class="chip cust ${on('__other')?'on':''}" data-f="${f.id}" data-o="__other">✎ Custom</button>`:''}
         ${f.noDK?'':`<button class="chip unk ${unk||(f.type==='multi'&&sel.includes(DK))?'on':''}" data-f="${f.id}" data-o="${DK}">Don't know</button>`}</div>
         ${hasOther(f)&&on('__other')?`<input class="f mt8" data-t="${f.id}_other" placeholder="Not in the list? Type your own answer" value="${esc(A[f.id+'_other'])}">`:''}`;
@@ -435,21 +447,27 @@ function drawQs(){
 }
 
 /* ---------------- formatting answers ---------------- */
+const nice=n=>{const x=String(n).replace(/,/g,'').trim(); return /^\d+(\.\d+)?$/.test(x)?Number(x).toLocaleString('en-US'):n;};
 const termName=(t,A)=>t==='__other'?(A.terms_other||'Custom term'):t;
 function fmt(f,A){
   let v=A[f.id];
-  if(f.type==='prices'){ const p=A.prices||{}; const out=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`${termName(t,A)} ${A.currency||'USD'} ${p[t]}/${A.per||'MT'}`); return out.join(' · ')||''; }
+  if(f.type==='prices'){ const p=A.prices||{}; const out=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`${termName(t,A)} ${A.currency||'USD'} ${nice(p[t])}/${A.per||'MT'}`); return out.join(' · ')||''; }
   if(v==='__other') return A[f.id+'_other']||'';
   if(Array.isArray(v)) return v.map(x=>x==='__other'?(A[f.id+'_other']||''):x).filter(Boolean).join(', ');
-  if(v&&typeof v==='object') return v.n?`${v.n} ${v.u||''}`.trim():'';
+  if(v&&typeof v==='object') return v.n?`${nice(v.n)} ${v.u||''}`.trim():'';
+  if(f.type==='date'&&/^\d{4}-\d\d-\d\d$/.test(v||'')) return new Date(v+'T00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   return v||'';
 }
+const OUT={'Which region?':'Region','Light or heavy?':'Gravity','Sweet or sour?':'Sulphur','Virgin or recycled?':'Condition',
+  'Where is the product?':'Location','Which Platts benchmark?':'Platts benchmark','Broker commission?':'Broker commission',
+  'Destination port / country':'Destination','You are the':'Role','Your name':'Name','WhatsApp number':'WhatsApp','Anything else':'Notes',
+  'Price for each term':'Prices','Offer valid until':'Valid until','Product owner (company)':'Product owner','Vessel position now':'Vessel position'};
 const hasOther = f => (f.type==='chips'||f.type==='multi') && f.other!==false && !f.noDK;
 function customEntries(){
   const A=S.ans, out=[];
   STAGES.forEach((st,i)=>fieldsFor(i).filter(f=>visible(f)&&hasOther(f)).forEach(f=>{
     const v=A[f.id], picked = Array.isArray(v)?v.includes('__other'):v==='__other', t=(A[f.id+'_other']||'').trim();
-    if(picked&&t) out.push({q:(i===0?cat().name+' — ':'')+f.label, v:t});
+    if(picked&&t) out.push({q:(i===0?cat().name+' — ':'')+f.label, v:t, key:lkey(i,f)});
   }));
   return out;
 }
@@ -457,6 +475,7 @@ function sections(){
   const A=S.ans, out=[];
   STAGES.forEach((st,i)=>{
     const rows = fieldsFor(i).filter(f=>visible(f)&&f.type!=='files').map(f=>({k:f.label,v:fmt(f,A)}));
+    rows.forEach(r=>{ if(OUT[r.k]) r.k=OUT[r.k]; });
     if(i===0){ const gl=(cat().fields.find(f=>f.id==='grade')||{}).label; rows.forEach(r=>{ if(r.k===gl) r.k='Product name / grade'; }); rows.unshift({k:'Product',v:cat().name}); }
     if(i===4) rows.push({k:'Attached files',v:S.files.map(f=>f.name).join(', ')});
     out.push({title:st.title, bg:i===0?cat().bg:st.bg, rows, i});
@@ -494,15 +513,19 @@ function renderReview(app){
 /* ---------------- PDF ---------------- */
 function buildSheet(){
   const c=cat(), A=S.ans, sc=completeness();
-  const p=A.prices||{}; const prices=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`<div>${t} · ${A.currency||'USD'} ${esc(p[t])} / ${A.per||'MT'}</div>`).join('');
-  const docs=STAGES[4].fields[0].options.map(o=>`<span class="${(A.documents||[]).includes(o)?'y':''}">${(A.documents||[]).includes(o)?'✓ ':''}${esc(o)}</span>`).join('');
+  const p=A.prices||{}, dest=(A.destination&&A.destination!==DK)?A.destination:'';
+  const prices=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`<div>${esc(termName(t,A))}${dest&&['CIF','CFR','DAP'].includes(t)?' '+esc(dest):''} · ${A.currency||'USD'} ${esc(nice(p[t]))} / ${A.per||'MT'}</div>`).join('');
+  const v=id=>{const x=fmt({id,type:''},A);return x&&x!==DK?x:''};
+  const pline=[v('basis'),v('platts'),v('discount')&&('premium/discount '+v('discount')),/^Yes/.test(A.commission||'')&&('broker commission '+(v('commamt')||'')+(/top/.test(A.commission)?' on top':' included'))].filter(Boolean).join(' · ');
+  const cdoc=(A.documents||[]).includes('__other')&&A.documents_other?`<span class="y">✓ ${esc(A.documents_other)}</span>`:'';
+  const docs=cdoc+optsOf(STAGES[4].fields[0],4).map(o=>`<span class="${(A.documents||[]).includes(o)?'y':''}">${(A.documents||[]).includes(o)?'✓ ':''}${esc(o)}</span>`).join('');
   const secs=sections();
   const box=(s,full)=>`<div class="box ${full?'full':''}"><h3><i style="background:${s.bg};border:1px solid #0002"></i>${s.title}</h3><table>${s.rows.filter(r=>r.k!=='Documents the seller has').map(r=>`<tr><td>${esc(r.k)}</td><td class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</td></tr>`).join('')}</table></div>`;
   $('#sheet').innerHTML=`
    <div class="sh-top"><div class="m">${drop}</div><div><h1>${esc(CONFIG.brandName)}</h1><p>Oil offer sheet</p></div><div class="sh-ref"><b>${ref}</b>${new Date().toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})}</div></div>
    <div class="sh-hero ${c.dark?'dark':''}" style="background:${c.bg};color:${c.fg};${c.bg==='#FFFFFF'?'border:1.5px solid #D9D3C5':''}">
      <div><span class="tag">${esc(c.name)}</span><h2>${esc(productTitle())}</h2><div style="font-size:14px;font-weight:600">${esc([fmt({id:'origin',type:'chips'},A),fmt({id:'qty',type:'qty'},A),A.where].filter(x=>x&&x!==DK).join(' · '))}</div></div>
-     ${prices?`<div class="prices">${prices}</div>`:''}</div>
+     ${prices?`<div class="prices">${prices}${pline?`<small>${esc(pline)}</small>`:''}</div>`:''}</div>
    <div class="grid">
      ${box(secs[0])}${box(secs[1])}${box(secs[2])}${box(secs[3])}
      <div class="box full"><h3><i style="background:#CDD97A;border:1px solid #0002"></i>Documents the seller has</h3><div class="docs">${docs}</div>
@@ -510,7 +533,7 @@ function buildSheet(){
      ${box(secs[5],true)}
      <div class="box full"><h3>Offer completeness · ${sc}%</h3><div class="meter"><i style="width:${sc}%"></i></div></div>
    </div>
-   <div class="foot"><span>Submitted via offer intake web app</span><span>${ref}</span></div>`;
+   <div class="foot"><span>Submitted via petromad.space</span><span>${ref}</span></div>`;
 }
 async function makePdf(){
   if(typeof html2pdf==='undefined'){toast('PDF tool is still loading — try again in a moment');throw new Error('no html2pdf')}
@@ -601,7 +624,7 @@ function renderDone(app){
   $('#sWa').onclick=sendWa; $('#again').onclick=()=>{S={cat:null,ans:{},files:[]};ref='';view='home';render()};
 }
 
-load(); render();
+load(); loadLearned(); render();
 </script>
 </body>
 </html>
