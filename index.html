@@ -169,6 +169,11 @@ textarea.f{min-height:90px;resize:vertical}
    whatsappNumber: international format, digits only (e.g. 971501234567)
    ============================================================ */
 const CONFIG = {
+  // MAIN ROUTE: Google Apps Script web-app URL. Sends from your Gmail, saves files to
+  // Google Drive, logs the offer in a Google Sheet and pings your phone (ntfy app).
+  scriptUrl: "",
+  // BACKUP ROUTE (only used if scriptUrl is empty or fails): FormSubmit email + ntfy push
+  ntfyTopic: "",
   receiverEmail: "YOUR_EMAIL@example.com",
   whatsappNumber: "971500000000",
   brandName: "Oil Business Management"
@@ -448,7 +453,7 @@ function renderReview(app){
    ${sections().map(s=>`<div class="sum"><h3><i style="width:12px;height:12px;border-radius:50%;background:${s.bg};border:1px solid #0002;margin-right:8px;display:inline-block"></i>${s.title}<button data-edit="${s.i}">Edit</button></h3>
      <dl class="kv">${s.rows.map(r=>`<dt>${esc(r.k)}</dt><dd class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</dd>`).join('')}</dl></div>`).join('')}
    <div class="send">
-     <button class="sbtn" style="background:#6A4CF5;color:#fff" id="sEmail"><div>Send by email<small>PDF + all attached files</small></div><span class="go">${arrow}</span></button>
+     <button class="sbtn" style="background:#6A4CF5;color:#fff" id="sEmail"><div>Send offer<small>To our desk by email, with PDF and files</small></div><span class="go">${arrow}</span></button>
      <button class="sbtn" style="background:#CDD97A" id="sShare"><div>Share PDF to WhatsApp<small>Opens your share menu</small></div><span class="go">${arrow}</span></button>
      <button class="sbtn" style="background:#FFC83D" id="sWa"><div>Send summary on WhatsApp<small>Text message to our desk</small></div><span class="go">${arrow}</span></button>
      <button class="sbtn" style="background:#fff" id="sDl"><div>Download PDF<small>Save the offer sheet</small></div><span class="go">${arrow}</span></button>
@@ -502,11 +507,45 @@ function summaryText(){
 }
 function sendWa(){ window.open(`https://wa.me/${CONFIG.whatsappNumber.replace(/\D/g,'')}?text=${encodeURIComponent(summaryText())}`,'_blank'); }
 
-/* ---------------- email (FormSubmit, no server needed) ---------------- */
+/* ---------------- sending: Gmail (Apps Script) → backup FormSubmit ---------------- */
+const val = id => { const v=fmt({id,type:''},S.ans); return v && v!==DK ? v : ''; };
+function offerFields(){
+  const A=S.ans;
+  return { ref, product: productTitle(), category: cat().name,
+    origin: val('origin'), refinery: val('refinery'), seller: val('position'),
+    quantity: val('qty'), location: [A.where,A.vessel,A.terminal].filter(x=>x&&x!==DK).join(' · '),
+    price: fmt({id:'prices',type:'prices'},A), contactName: val('cname'), company: val('company'),
+    phone: val('phone'), email: val('email'), completeness: completeness()+'%',
+    sections: sections().map(s=>({title:s.title,color:s.bg,rows:s.rows.map(r=>({k:r.k,v:r.v||''}))})),
+    text: summaryText().replace(/\*/g,'') };
+}
+const toB64 = blob => new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob)});
+async function notifyPhone(o){
+  if(!CONFIG.ntfyTopic) return;
+  try{ await fetch('https://ntfy.sh/',{method:'POST',body:JSON.stringify({topic:CONFIG.ntfyTopic,title:`New offer: ${o.product}`,
+    message:[o.category,o.origin,o.quantity,o.price,`From ${o.contactName} ${o.phone}`.trim(),`Ref ${o.ref} · ${o.completeness} complete`].filter(Boolean).join('\n'),
+    tags:['oil_drum'],priority:4})}) }catch(e){}
+}
+const emailReady = ()=> CONFIG.receiverEmail && !/YOUR_EMAIL/.test(CONFIG.receiverEmail);
 async function sendEmail(){
-  if(!CONFIG.receiverEmail||/YOUR_EMAIL/.test(CONFIG.receiverEmail)){toast('Email is not set up yet — add your address in CONFIG.receiverEmail',4000);return}
-  const btn=$('#sEmail'); btn.disabled=true; toast('Sending…',4000);
+  const btn=$('#sEmail'); btn.disabled=true; toast('Sending…',6000);
   let pdf; try{pdf=await makePdf()}catch(e){btn.disabled=false;return}
+  const o=offerFields();
+  if(CONFIG.scriptUrl){
+    try{
+      const files=[{name:ref+'.pdf',mime:'application/pdf',data:await toB64(pdf)}];
+      for(const f of S.files) files.push({name:f.name,mime:f.type||'application/octet-stream',data:await toB64(f)});
+      const r=await fetch(CONFIG.scriptUrl,{method:'POST',body:JSON.stringify({...o,files})});
+      const j=await r.json(); if(!j.ok) throw new Error(j.error||'failed');
+      return finishSent();
+    }catch(e){ console.warn(e); if(!emailReady()){btn.disabled=false;toast('Could not send. Check your connection and tap Send offer again.',4500);return} }
+  }
+  if(!emailReady()){btn.disabled=false;toast('Sending is not set up yet. Add scriptUrl or receiverEmail in CONFIG.',4500);return}
+  await notifyPhone(o);
+  sendFormSubmit(pdf);
+}
+function finishSent(){ try{localStorage.removeItem('oilOfferDraft')}catch(e){} view='done'; render(); }
+function sendFormSubmit(pdf){
   const f=document.createElement('form'); f.method='POST'; f.enctype='multipart/form-data'; f.target='fsframe';
   f.action='https://formsubmit.co/'+encodeURIComponent(CONFIG.receiverEmail); f.style.display='none';
   const add=(n,v)=>{const i=document.createElement('input');i.type='hidden';i.name=n;i.value=v;f.appendChild(i)};
@@ -518,7 +557,7 @@ async function sendEmail(){
   const allFiles=[new File([pdf],ref+'.pdf',{type:'application/pdf'}),...S.files];
   allFiles.forEach((file,i)=>{const inp=document.createElement('input');inp.type='file';inp.name='attachment'+(i+1);const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;f.appendChild(inp)});
   document.body.appendChild(f);
-  $('#fsframe').onload=()=>{f.remove(); try{localStorage.removeItem('oilOfferDraft')}catch(e){} view='done'; render();};
+  $('#fsframe').onload=()=>{f.remove(); finishSent();};
   f.submit();
 }
 
