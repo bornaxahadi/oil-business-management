@@ -94,6 +94,11 @@ textarea.f{min-height:90px;resize:vertical}
 .perks{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
 .perks span{background:#fff;border-radius:99px;padding:7px 12px;font-size:13px;font-weight:600}
 .prices small{display:block;font-size:11px;font-weight:600;opacity:.8;max-width:260px;text-align:right;margin-top:2px}
+.logobox{display:flex;align-items:center;gap:10px;background:#F6F3EC;border-radius:16px;padding:12px}
+.logobox img{max-height:56px;max-width:130px;object-fit:contain;background:#fff;border-radius:10px;padding:6px;margin-right:auto}
+.lbtn{font:700 13px 'Urbanist',sans-serif;background:#fff;border:0;border-radius:99px;padding:9px 14px;cursor:pointer;color:#1B1B1B}
+.logoup{font-size:22px}.logoup b{display:block;font-size:15px;margin-top:4px}
+.forget{display:block;margin-top:10px;font:600 12px 'Urbanist',sans-serif;color:#6E6A61;text-decoration:underline;background:none;border:0;padding:0;cursor:pointer}
 .fbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fbtns .files{padding:16px 8px;font-size:22px}
 .fbtns .files b{display:block;font-size:15px;margin-top:4px}
@@ -163,6 +168,17 @@ textarea.f{min-height:90px;resize:vertical}
 #sheet .docs span.y{background:#1B1B1B;color:#fff}
 #sheet .meter{height:10px;border-radius:9px;background:#EEEAE0;overflow:hidden;margin-top:8px}
 #sheet .meter i{display:block;height:100%;background:#1B1B1B}
+#sheet .sh-top .lg{max-height:58px;max-width:170px;object-fit:contain}
+#sheet .sh-top.lh h1{font-size:21px;font-weight:800}
+#sheet .sh-top.lh .sh-ref b{letter-spacing:.08em}
+#sheet .sig .sigrow{display:flex;gap:18px;align-items:center}
+#sheet .sig img{max-height:64px;max-width:130px;object-fit:contain}
+#sheet .sig small{display:block;font-size:11px;color:#6E6A61}
+#sheet .sig b{display:block;font-size:19px;font-weight:800;margin:2px 0}
+#sheet .sig span{display:block;font-size:12.5px;margin-top:2px}
+#sheet .sig .sigline{margin-left:auto;align-self:flex-end;border-top:1.5px solid #1B1B1B;padding-top:6px;width:190px;text-align:center;font-size:11px;color:#6E6A61}
+#sheet .sig .notes{font-size:12.5px;margin-top:12px}
+#sheet .sig .notes b{display:inline;font-size:12.5px;font-weight:700;margin:0}
 #sheet .foot{margin-top:16px;font-size:11px;color:#6E6A61;display:flex;justify-content:space-between}
 </style>
 </head>
@@ -301,13 +317,16 @@ const STAGES = [
    {id:'files',label:'Attach documents & product photos',hint:'photos of the product sample, tank or vessel help a lot',type:'files'},
    {id:'spec',label:'Key spec values',hint:'density, sulphur, flash point…',type:'textarea'}
   ]},
- {key:'contact', title:'Who sent it', text:'So we can reply quickly.', bg:'#6A4CF5', fg:'#fff',
+ {key:'contact', title:'Your details', text:'They go on an official offer letter, and are saved on this phone for next time.', bg:'#6A4CF5', fg:'#fff',
   fields:[
+   {id:'logo',label:'Company logo',hint:'optional · shown on your offer letter',type:'logo',noDK:true},
    {id:'cname',label:'Your name',type:'text',required:true,noDK:true},
    {id:'company',label:'Company',type:'text'},
    {id:'role',label:'You are the',type:'chips',options:['Seller','Seller mandate','Broker','Buyer-side broker']},
    {id:'phone',label:'WhatsApp number',type:'text',input:'tel',noDK:true},
    {id:'email',label:'Email',type:'text',input:'email',noDK:true},
+   {id:'address',label:'Company address',type:'text',noDK:true},
+   {id:'website',label:'Website',type:'text',noDK:true},
    {id:'notes',label:'Anything else',type:'textarea',noDK:true}
   ]}
 ];
@@ -326,7 +345,10 @@ async function loadLearned(){
     if(j&&j.ok&&j.options){ LEARNED=j.options; localStorage.setItem('oilLearned',JSON.stringify(LEARNED)); if(view==='form') render(); } }catch(e){}
 }
 const esc = v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const save=()=>{try{localStorage.setItem('oilOfferDraft',JSON.stringify({cat:S.cat,ans:S.ans}))}catch(e){}};
+const PKEYS=['cname','company','role','phone','email','address','website'];
+let PROFILE={ans:{},logo:''}; try{ PROFILE=Object.assign(PROFILE,JSON.parse(localStorage.getItem('oilProfile')||'{}')) }catch(e){}
+const saveProfile=()=>{ PKEYS.forEach(k=>{ const v=S.ans[k]; if(v&&v!==DK) PROFILE.ans[k]=v; }); try{localStorage.setItem('oilProfile',JSON.stringify(PROFILE))}catch(e){ toast('Logo too large to save, try a smaller image') } };
+const save=()=>{try{localStorage.setItem('oilOfferDraft',JSON.stringify({cat:S.cat,ans:S.ans}))}catch(e){} saveProfile();};
 const load=()=>{try{const d=JSON.parse(localStorage.getItem('oilOfferDraft')||'null');if(d&&d.cat){S.cat=d.cat;S.ans=d.ans||{}}}catch(e){}};
 const cat = ()=>CATS.find(c=>c.id===S.cat);
 const fieldsFor = i=> i===0 ? cat().fields : STAGES[i].fields;
@@ -360,7 +382,7 @@ function renderHome(app){
    <div class="stack">${CATS.map(c=>`<button class="cat ${c.dark?'dark':''} ${c.bg==='#FFFFFF'?'light':''}" data-c="${c.id}" style="background:${c.bg};color:${c.fg}">
      <span class="ic">${c.icon}</span><span><b>${c.name}</b><span class="sub">${c.sub}</span></span><span class="go">${arrow}</span></button>`).join('')}</div>
   </div>`;
-  app.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ if(S.cat!==b.dataset.c){S={cat:b.dataset.c,ans:{currency:'USD',per:'MT'},files:[]}} view='form';step=0;save();render(); });
+  app.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ if(S.cat!==b.dataset.c){S={cat:b.dataset.c,ans:{currency:'USD',per:'MT',...PROFILE.ans},files:[]}} view='form';step=0;save();render(); });
   const r=$('#resume'); if(r) r.onclick=()=>{view='form';step=0;render()};
 }
 
@@ -417,6 +439,11 @@ function drawQs(){
     } else if(f.type==='prices'){
       const p=A.prices||{};
       body=`<div class="pricegrid">${A.terms.filter(t=>t!==DK).map(t=>`<div class="pricerow"><b>${esc(termName(t,A))}</b><input inputmode="decimal" data-p="${t}" value="${esc(p[t])}" placeholder="${A.currency||'USD'} per ${A.per||'MT'}"></div>`).join('')||'<small class="hint">Pick a delivery term above.</small>'}</div>`;
+    } else if(f.type==='logo'){
+      body = (PROFILE.logo
+        ? `<div class="logobox"><img src="${PROFILE.logo}" alt="logo"><label class="lbtn">Change<input type="file" id="logoIn" accept="image/*" hidden></label><button class="lbtn" id="logoRm">Remove</button></div>`
+        : `<label class="files logoup">🏷️<b>Upload your logo</b><small>PNG or JPG</small><input type="file" id="logoIn" accept="image/*" hidden></label>`)
+        + (Object.keys(PROFILE.ans).length||PROFILE.logo ? `<button class="forget" id="forgetMe">Saved on this phone · forget my details</button>` : '');
     } else if(f.type==='files'){
       const full=S.files.length>=MAXF;
       body=`<div class="fbtns ${full?'full':''}"><label class="files">📄<b>Files & PDF</b><small>PDF, Word, Excel</small><input type="file" class="fileIn" multiple hidden ${full?'disabled':''} accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,application/pdf"></label>
@@ -438,6 +465,14 @@ function drawQs(){
     save(); drawQs();
   });
   box.querySelectorAll('[data-t]').forEach(i=>i.oninput=()=>{A[i.dataset.t]=i.value;save()});
+  const li=$('#logoIn'); if(li) li.onchange=()=>{ const file=li.files[0]; if(!file) return;
+    const img=new Image(); img.onload=()=>{ const k=Math.min(1,600/Math.max(img.width,img.height)), c=document.createElement('canvas');
+      c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      PROFILE.logo=c.toDataURL('image/png'); saveProfile(); drawQs(); URL.revokeObjectURL(img.src); };
+    img.src=URL.createObjectURL(file); };
+  const lr=$('#logoRm'); if(lr) lr.onclick=()=>{ PROFILE.logo=''; saveProfile(); drawQs(); };
+  const fm=$('#forgetMe'); if(fm) fm.onclick=()=>{ if(!confirm('Forget your saved name, company, contacts and logo on this phone?')) return;
+    PROFILE={ans:{},logo:''}; try{localStorage.removeItem('oilProfile')}catch(e){} PKEYS.forEach(k=>delete A[k]); save(); try{localStorage.removeItem('oilProfile')}catch(e){} drawQs(); };
   box.querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>{const id=b.dataset.dk;A[id]=A[id]===DK?'':DK;save();drawQs()});
   box.querySelectorAll('[data-qn]').forEach(i=>i.oninput=()=>{const id=i.dataset.qn;const q=(A[id]&&typeof A[id]==='object')?A[id]:{u:'MT'};q.n=i.value;A[id]=q;save()});
   box.querySelectorAll('[data-qu]').forEach(b=>b.onclick=()=>{const id=b.dataset.qu;const q=(A[id]&&typeof A[id]==='object')?A[id]:{n:''};q.u=b.dataset.o;A[id]=q;save();drawQs()});
@@ -476,6 +511,7 @@ function sections(){
   STAGES.forEach((st,i)=>{
     const rows = fieldsFor(i).filter(f=>visible(f)&&f.type!=='files').map(f=>({k:f.label,v:fmt(f,A)}));
     rows.forEach(r=>{ if(OUT[r.k]) r.k=OUT[r.k]; });
+    { const lg=rows.findIndex(r=>r.k==='Company logo'); if(lg>-1) rows.splice(lg,1); }
     if(i===0){ const gl=(cat().fields.find(f=>f.id==='grade')||{}).label; rows.forEach(r=>{ if(r.k===gl) r.k='Product name / grade'; }); rows.unshift({k:'Product',v:cat().name}); }
     if(i===4) rows.push({k:'Attached files',v:S.files.map(f=>f.name).join(', ')});
     out.push({title:st.title, bg:i===0?cat().bg:st.bg, rows, i});
@@ -516,13 +552,19 @@ function buildSheet(){
   const p=A.prices||{}, dest=(A.destination&&A.destination!==DK)?A.destination:'';
   const prices=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`<div>${esc(termName(t,A))}${dest&&['CIF','CFR','DAP'].includes(t)?' '+esc(dest):''} · ${A.currency||'USD'} ${esc(nice(p[t]))} / ${A.per||'MT'}</div>`).join('');
   const v=id=>{const x=fmt({id,type:''},A);return x&&x!==DK?x:''};
+  const co=v('company'), nm=v('cname'), when=new Date().toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'});
+  const contacts=[v('phone'),v('email'),v('website')].filter(Boolean).join(' · ');
+  const lhead=(PROFILE.logo||co)
+    ? `<div class="sh-top lh">${PROFILE.logo?`<img class="lg" src="${PROFILE.logo}">`:''}<div><h1>${esc(co||nm)}</h1><p>${esc([v('address'),contacts].filter(Boolean).join(' · '))}</p></div><div class="sh-ref"><b>OFFICIAL OFFER</b>${ref}<br>${when}</div></div>`
+    : `<div class="sh-top"><div class="m">${drop}</div><div><h1>${esc(CONFIG.brandName)}</h1><p>Oil offer sheet</p></div><div class="sh-ref"><b>${ref}</b>${when}</div></div>`;
+  const sig=`<div class="box full sig"><div class="sigrow">${PROFILE.logo?`<img src="${PROFILE.logo}">`:''}<div><small>Issued for and on behalf of</small><b>${esc(co||nm||'—')}</b>${nm?`<span>${esc([nm,v('role')].filter(Boolean).join(', '))}</span>`:''}${contacts?`<span>${esc(contacts)}</span>`:''}${v('address')?`<span>${esc(v('address'))}</span>`:''}</div><div class="sigline">Signature &amp; stamp</div></div>${v('notes')?`<p class="notes"><b>Notes:</b> ${esc(v('notes'))}</p>`:''}</div>`;
   const pline=[v('basis'),v('platts'),v('discount')&&('premium/discount '+v('discount')),/^Yes/.test(A.commission||'')&&('broker commission '+(v('commamt')||'')+(/top/.test(A.commission)?' on top':' included'))].filter(Boolean).join(' · ');
   const cdoc=(A.documents||[]).includes('__other')&&A.documents_other?`<span class="y">✓ ${esc(A.documents_other)}</span>`:'';
   const docs=cdoc+optsOf(STAGES[4].fields[0],4).map(o=>`<span class="${(A.documents||[]).includes(o)?'y':''}">${(A.documents||[]).includes(o)?'✓ ':''}${esc(o)}</span>`).join('');
   const secs=sections();
   const box=(s,full)=>`<div class="box ${full?'full':''}"><h3><i style="background:${s.bg};border:1px solid #0002"></i>${s.title}</h3><table>${s.rows.filter(r=>r.k!=='Documents the seller has').map(r=>`<tr><td>${esc(r.k)}</td><td class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</td></tr>`).join('')}</table></div>`;
   $('#sheet').innerHTML=`
-   <div class="sh-top"><div class="m">${drop}</div><div><h1>${esc(CONFIG.brandName)}</h1><p>Oil offer sheet</p></div><div class="sh-ref"><b>${ref}</b>${new Date().toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})}</div></div>
+   ${lhead}
    <div class="sh-hero ${c.dark?'dark':''}" style="background:${c.bg};color:${c.fg};${c.bg==='#FFFFFF'?'border:1.5px solid #D9D3C5':''}">
      <div><span class="tag">${esc(c.name)}</span><h2>${esc(productTitle())}</h2><div style="font-size:14px;font-weight:600">${esc([fmt({id:'origin',type:'chips'},A),fmt({id:'qty',type:'qty'},A),A.where].filter(x=>x&&x!==DK).join(' · '))}</div></div>
      ${prices?`<div class="prices">${prices}${pline?`<small>${esc(pline)}</small>`:''}</div>`:''}</div>
@@ -530,10 +572,9 @@ function buildSheet(){
      ${box(secs[0])}${box(secs[1])}${box(secs[2])}${box(secs[3])}
      <div class="box full"><h3><i style="background:#CDD97A;border:1px solid #0002"></i>Documents the seller has</h3><div class="docs">${docs}</div>
        <table style="margin-top:10px"><tr><td>Attached files</td><td>${esc(S.files.map(f=>f.name).join(', ')||'—')}</td></tr><tr><td>Key spec values</td><td>${esc(A.spec||'—')}</td></tr></table></div>
-     ${box(secs[5],true)}
-     <div class="box full"><h3>Offer completeness · ${sc}%</h3><div class="meter"><i style="width:${sc}%"></i></div></div>
+     ${sig}
    </div>
-   <div class="foot"><span>Submitted via petromad.space</span><span>${ref}</span></div>`;
+   <div class="foot"><span>Submitted via petromad.space · ${sc}% complete</span><span>${ref}</span></div>`;
 }
 async function makePdf(){
   if(typeof html2pdf==='undefined'){toast('PDF tool is still loading — try again in a moment');throw new Error('no html2pdf')}
