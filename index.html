@@ -293,7 +293,7 @@ const STAGES = [
  {key:'docs', title:'Documents & files', text:'Tick what the seller can show, then attach the spec and any files.', bg:'#CDD97A', fg:'#1B1B1B',
   fields:[
    {id:'documents',label:'Documents the seller has',type:'multi',options:['SGS / Q&Q report','Certificate of quality','Certificate of origin','Commercial invoice','Bill of lading','Q88 (vessel)','Tank storage receipt','Dip test authorization','Product passport','Refinery commitment letter','FCO / offer letter','SPA draft']},
-   {id:'files',label:'Attach spec sheet & files',type:'files'},
+   {id:'files',label:'Attach documents & product photos',hint:'photos of the product sample, tank or vessel help a lot',type:'files'},
    {id:'spec',label:'Key spec values',hint:'density, sulphur, flash point…',type:'textarea'}
   ]},
  {key:'contact', title:'Who sent it', text:'So we can reply quickly.', bg:'#6A4CF5', fg:'#fff',
@@ -406,7 +406,7 @@ function drawQs(){
     } else if(f.type==='files'){
       const full=S.files.length>=MAXF;
       body=`<div class="fbtns ${full?'full':''}"><label class="files">📄<b>Files & PDF</b><small>PDF, Word, Excel</small><input type="file" class="fileIn" multiple hidden ${full?'disabled':''} accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,application/pdf"></label>
-        <label class="files">📷<b>Photos</b><small>Gallery or camera</small><input type="file" class="fileIn" multiple hidden ${full?'disabled':''} accept="image/*"></label></div>
+        <label class="files">📷<b>Product photos</b><small>Sample, tank, vessel, documents</small><input type="file" class="fileIn" multiple hidden ${full?'disabled':''} accept="image/*"></label></div>
         <small class="hint fcount">${S.files.length} of ${MAXF} files added · max 8 MB each</small>
         <div class="flist">${S.files.map((x,i)=>`<div><span>${esc(x.name)}</span><small>${(x.size/1024/1024).toFixed(1)} MB</small><button data-rm="${i}" aria-label="Remove">✕</button></div>`).join('')}</div>`;
     }
