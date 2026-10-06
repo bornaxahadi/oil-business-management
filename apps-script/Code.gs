@@ -11,6 +11,7 @@
  */
 const SETTINGS = {
   toEmail: 'petromadxb@gmail.com',   // every offer is sent here
+  ccEmail: 'ahadiborna@gmail.com',   // and copied here
   ntfyTopic: 'CHOOSE-A-SECRET-NAME', // same name you subscribe to in the ntfy app
   folderName: 'Oil Offers',
   sheetName: 'Oil Offers — Inbox'
@@ -48,6 +49,7 @@ function doPost(e) {
 
     const to = SETTINGS.toEmail || Session.getEffectiveUser().getEmail();
     const opts = {htmlBody: html_(d, ref, sub.getUrl(), attach.length < blobs.length), attachments: attach, name: 'Oil Offer Desk'};
+    if (SETTINGS.ccEmail) opts.cc = SETTINGS.ccEmail;
     if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email || '')) opts.replyTo = d.email;
     GmailApp.sendEmail(to, 'New oil offer ' + ref + ' — ' + (d.product || '') + (d.customs && d.customs.length ? ' ★ new options' : ''), d.text || '', opts);
 

@@ -181,6 +181,7 @@ const CONFIG = {
   // BACKUP ROUTE (only used if scriptUrl is empty or fails): FormSubmit email + ntfy push
   ntfyTopic: "",
   receiverEmail: "petromadxb@gmail.com",
+  ccEmail: "ahadiborna@gmail.com",   // every offer is also copied here
   whatsappNumber: "971500000000",
   brandName: "Oil Business Management"
 };
@@ -575,6 +576,7 @@ function sendFormSubmit(pdf){
   const f=document.createElement('form'); f.method='POST'; f.enctype='multipart/form-data'; f.target='fsframe';
   f.action='https://formsubmit.co/'+encodeURIComponent(CONFIG.receiverEmail); f.style.display='none';
   const add=(n,v)=>{const i=document.createElement('input');i.type='hidden';i.name=n;i.value=v;f.appendChild(i)};
+  if(CONFIG.ccEmail) add('_cc',CONFIG.ccEmail);
   add('_subject',`New oil offer ${ref} — ${productTitle()}`); add('_captcha','false'); add('_template','table');
   if(S.ans.email&&S.ans.email!==DK) add('_replyto',S.ans.email);
   add('Reference',ref); add('Product',`${productTitle()} (${cat().name})`);
