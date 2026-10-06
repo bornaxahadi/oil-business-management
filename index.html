@@ -455,6 +455,7 @@ function sections(){
   const A=S.ans, out=[];
   STAGES.forEach((st,i)=>{
     const rows = fieldsFor(i).filter(f=>visible(f)&&f.type!=='files').map(f=>({k:f.label,v:fmt(f,A)}));
+    if(i===0){ const gl=(cat().fields.find(f=>f.id==='grade')||{}).label; rows.forEach(r=>{ if(r.k===gl) r.k='Product name / grade'; }); rows.unshift({k:'Product',v:cat().name}); }
     if(i===4) rows.push({k:'Attached files',v:S.files.map(f=>f.name).join(', ')});
     out.push({title:st.title, bg:i===0?cat().bg:st.bg, rows, i});
   });
@@ -472,7 +473,7 @@ function renderReview(app){
   app.innerHTML=`<div class="screen">
    ${topbar(`<button class="circ" id="bk" aria-label="Back">${back}</button><div style="margin:0 auto;text-align:center"><h4>Review offer</h4><small>${ref}</small></div><span style="width:52px"></span>`)}
    <h1 class="hero" style="font-size:36px">${esc(productTitle())}</h1>
-   <p class="lede">${esc(cat().name)} offer. Check the details, then send.</p>
+   <p class="lede"><b>Product:</b> ${esc(cat().name)}${productTitle()!==cat().name?' · '+esc(productTitle()):''}<br>Check the details, then send.</p>
    <div class="score"><b>${sc}%</b><p>of the offer details are filled in. ${sc<50?'Fewer details means slower checking — add vessel, documents or price if you can.':'Good — this is enough to start checking.'}</p></div>
    ${sections().map(s=>`<div class="sum"><h3><i style="width:12px;height:12px;border-radius:50%;background:${s.bg};border:1px solid #0002;margin-right:8px;display:inline-block"></i>${s.title}<button data-edit="${s.i}">Edit</button></h3>
      <dl class="kv">${s.rows.map(r=>`<dt>${esc(r.k)}</dt><dd class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</dd>`).join('')}</dl></div>`).join('')}
