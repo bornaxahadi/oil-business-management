@@ -15,6 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <style>
 /* Settings (email + WhatsApp) are in the CONFIG block at the top of the script */
 :root{
@@ -145,6 +146,13 @@ textarea.f{min-height:90px;resize:vertical}
 .pcard.empty .pav{background:var(--purple);color:#fff;font-size:34px;font-weight:500;box-shadow:none}
 .pcard.empty small{color:var(--purple);opacity:1}
 .pcard.empty .pedit{background:var(--purple);color:#fff}
+.ptot{margin-top:10px;background:var(--soft);border-radius:14px;padding:12px 14px}
+.ptot small{display:block;font-size:12.5px;color:var(--muted)}
+.ptot div{display:flex;justify-content:space-between;font-size:16px;margin-top:4px}.ptot b{font-size:18px}
+.totcard{background:var(--white);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:12px;border:2px solid var(--ink)}
+.totcard small{display:block;font-size:13px;color:var(--muted)}
+.totcard div{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;font-weight:600}
+.totcard b{font-size:24px;font-weight:800}
 .minis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mini{background:var(--white);border:0;border-radius:20px;padding:14px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
 .mini b{display:block;font-size:16px}.mini small{display:block;font-size:12px;opacity:.7;margin-top:2px}
@@ -193,65 +201,58 @@ textarea.f{min-height:90px;resize:vertical}
 @media (prefers-reduced-motion:no-preference){.screen{animation:in .28s ease-out}@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
 
 /* ================= PDF SHEET (off-screen) ================= */
-#sheet{position:fixed;left:-10000px;top:0;width:794px;background:#EEEAE0;font-family:'Urbanist',sans-serif;color:#1B1B1B;padding:34px}
-#sheet .sh-top{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-#sheet .sh-top .m{color:#fff;width:46px;height:46px;border-radius:50%;background:#1B1B1B;display:grid;place-items:center}
-#sheet .sh-top h1{font-size:15px;font-weight:700}
-#sheet .sh-top p{font-size:12px;color:#6E6A61}
-#sheet .sh-ref{margin-left:auto;text-align:right;font-size:12px}
-#sheet .sh-ref b{display:block;font-size:16px}
-#sheet .sh-hero{border-radius:28px;padding:24px 26px;margin-bottom:14px;display:flex;gap:20px;align-items:flex-end}
-#sheet .sh-hero h2{font-size:40px;line-height:1;font-weight:800;margin:10px 0 6px}
-#sheet .sh-hero .tag{display:inline-block;background:#1B1B1B;color:#fff;font-size:12px;font-weight:600;padding:4px 11px;border-radius:99px}
-#sheet .sh-hero.dark .tag{background:#fff;color:#1B1B1B}
-#sheet .sh-hero .prices{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
-#sheet .sh-hero .prices div{background:#fff;color:#1B1B1B;border-radius:99px;padding:7px 14px;font-weight:700;font-size:14px;white-space:nowrap}
-#sheet .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-#sheet .box{background:#fff;border-radius:20px;padding:16px 18px;break-inside:avoid}
-#sheet .box h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-#sheet .box h3 i{width:10px;height:10px;border-radius:50%;display:inline-block}
-#sheet .box table{width:100%;border-collapse:collapse;font-size:12.5px}
-#sheet .box td{padding:4px 0;vertical-align:top}
-#sheet .box td:first-child{color:#6E6A61;width:44%}
-#sheet .box td:last-child{font-weight:600}
-#sheet .box td.u{color:#A09A8C;font-weight:500;font-style:italic}
-#sheet .full{grid-column:1/-1}
-#sheet .docs{display:flex;flex-wrap:wrap;gap:6px}
-#sheet .docs span{font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;background:#F8F5EE}
-#sheet .docs span.y{background:#1B1B1B;color:#fff}
-#sheet .meter{height:10px;border-radius:9px;background:#EEEAE0;overflow:hidden;margin-top:8px}
-#sheet .meter i{display:block;height:100%;background:#1B1B1B}
-#sheet .sh-top .lg{max-height:58px;max-width:170px;object-fit:contain}
-#sheet .sh-top.lh h1{font-size:21px;font-weight:800}
-#sheet .sh-top.lh .sh-ref b{letter-spacing:.08em}
-#sheet .sig .sigrow{display:flex;gap:18px;align-items:center}
-#sheet .sig img{max-height:64px;max-width:130px;object-fit:contain}
-#sheet .sig small{display:block;font-size:11px;color:#6E6A61}
-#sheet .sig b{display:block;font-size:19px;font-weight:800;margin:2px 0}
-#sheet .sig span{display:block;font-size:12.5px;margin-top:2px}
-#sheet .sig .sigline{margin-left:auto;align-self:flex-end;border-top:1.5px solid #1B1B1B;padding-top:6px;width:190px;text-align:center;font-size:11px;color:#6E6A61}
-#sheet .sig .notes{font-size:12.5px;margin-top:12px}
-#sheet .sig .notes b{display:inline;font-size:12.5px;font-weight:700;margin:0}
-#sheet.d-letter{background:#fff}
-#sheet.d-letter .box{border:1px solid #E2DCCF;border-radius:10px}
-#sheet.d-letter .sh-hero{background:#fff!important;color:#1B1B1B!important;border:0!important;border-top:4px solid #1B1B1B!important;border-bottom:1px solid #1B1B1B!important;border-radius:0;padding:20px 2px 18px}
-#sheet.d-letter .sh-hero .tag{background:#1B1B1B;color:#fff}
-#sheet.d-letter .sh-hero .prices div{background:#F3F0E9}
-#sheet.d-letter .docs span{background:#F3F0E9}
-#sheet.d-letter .docs span.y{background:#1B1B1B;color:#fff}
-#sheet.d-letter .box h3 i{display:none}
-#sheet.d-dark{background:#111;color:#EEEAE2}
-#sheet.d-dark .box{background:#1E1E1E}
-#sheet.d-dark .box td:first-child,#sheet.d-dark .sh-top p,#sheet.d-dark .foot,#sheet.d-dark .sig small,#sheet.d-dark .sig .sigline{color:#9D978B}
-#sheet.d-dark .box td.u{color:#6F6A61}
-#sheet.d-dark .docs span{background:#2A2A2A;color:#E6E2DA}
-#sheet.d-dark .docs span.y{background:#EEEAE2;color:#111}
-#sheet.d-dark .sig .sigline{border-color:#EEEAE2}
-#sheet.d-dark .sh-top .m{background:#EEEAE2;color:#111}
-#sheet.d-dark .sh-hero{border:1px solid #ffffff2a}
-#sheet.d-dark .box h3 i{box-shadow:0 0 0 1px #ffffff55}
-#sheet.d-dark img.lg,#sheet.d-dark .sig img{background:#fff;border-radius:10px;padding:6px}
-#sheet .foot{margin-top:16px;font-size:11px;color:#6E6A61;display:flex;justify-content:space-between}
+#sheet{position:fixed;left:-10000px;top:0;width:794px;font-family:'Urbanist',sans-serif;--pg:#fff;--tx:#141414;--mut:#5F5B53;--rule:#D6D0C3;--rule2:#ECE8DF;--cell:#F6F3EC;--acc:#141414;--acc2:#141414;--onacc:#fff}
+#sheet.d-colour{--acc:var(--cat);--acc2:var(--cattx);--onacc:var(--oncat)}
+#sheet.d-dark{--pg:#121212;--tx:#EEEAE2;--mut:#A39D91;--rule:#3A3A3A;--rule2:#272727;--cell:#1D1D1D;--acc:#EEEAE2;--acc2:#EEEAE2;--onacc:#121212}
+#sheet .pg{width:794px;height:1123px;position:relative;background:var(--pg);color:var(--tx);padding:50px 56px 0;overflow:hidden}
+#sheet .blk{margin-bottom:20px}
+#sheet .lhd{display:flex;align-items:center;gap:18px;padding-bottom:18px;border-bottom:4px solid var(--acc)}
+#sheet .lhd img{max-height:66px;max-width:180px;object-fit:contain}
+#sheet .lhd .mk{width:58px;height:58px;border-radius:50%;background:var(--acc);color:var(--onacc);display:grid;place-items:center;flex:none}
+#sheet .lhd .mk svg{width:28px;height:28px}
+#sheet .lhd h1{font-size:27px;font-weight:800;line-height:1.1}
+#sheet .lhd p{font-size:14px;color:var(--mut);margin-top:5px;line-height:1.45}
+#sheet .lhd .rf{margin-left:auto;text-align:right;font-size:14px;color:var(--mut);line-height:1.55;flex:none}
+#sheet .lhd .rf b{display:block;font-size:16px;letter-spacing:.16em;color:var(--tx)}
+#sheet .rhd{display:flex;justify-content:space-between;font-size:14px;color:var(--mut);border-bottom:1.5px solid var(--rule);padding-bottom:10px;margin-bottom:20px}
+#sheet .rhd b{color:var(--tx)}
+#sheet .ttl .eb{font-size:14px;font-weight:800;letter-spacing:.18em;color:var(--acc2)}
+#sheet .ttl h2{font-size:46px;font-weight:800;line-height:1.05;margin:6px 0 2px;letter-spacing:-.5px}
+#sheet .ttl p{font-size:16px;color:var(--mut);margin-top:4px}
+#sheet .kf{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--rule);border-radius:12px;overflow:hidden}
+#sheet .kf div{padding:13px 14px;border-left:1.5px solid var(--rule)}
+#sheet .kf div:first-child{border-left:0}
+#sheet .kf small{display:block;font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--mut);text-transform:uppercase}
+#sheet .kf b{display:block;font-size:18px;font-weight:700;margin-top:5px;line-height:1.25}
+#sheet h3{font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--acc2);padding-bottom:8px;margin-bottom:6px;border-bottom:2px solid var(--acc)}
+#sheet table{width:100%;border-collapse:collapse}
+#sheet .skv{display:table}
+#sheet .skv td{padding:8px 10px 8px 0;vertical-align:top;border-bottom:1px solid var(--rule2);font-size:15.5px;line-height:1.35}
+#sheet .skv td.k{color:var(--mut);width:21%}
+#sheet .skv td.v{font-weight:700;width:29%}
+#sheet .pt th{text-align:left;font-size:12.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);padding:9px 10px 9px 0}
+#sheet .pt td{padding:12px 10px 12px 0;font-size:17px;font-weight:700;border-top:1px solid var(--rule2)}
+#sheet .pt .n{text-align:right;padding-right:0}
+#sheet .pt td.tv{font-size:19px;font-weight:800}
+#sheet .na{color:var(--mut);font-weight:500}
+#sheet .pnote{font-size:15px;margin-top:10px;line-height:1.55;color:var(--tx)}
+#sheet .pnote+.pnote{margin-top:6px;padding:12px 14px;background:var(--cell);border-radius:10px}
+#sheet .miss{font-size:13.5px;color:var(--mut);margin-top:8px;line-height:1.45}
+#sheet .docs{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;font-size:15.5px;margin-top:10px}
+#sheet .docs span{display:flex;gap:10px;align-items:center;color:var(--mut)}
+#sheet .docs span.y{color:var(--tx);font-weight:700}
+#sheet .docs i{width:20px;height:20px;border:1.8px solid var(--rule);border-radius:5px;display:grid;place-items:center;font-size:13px;font-style:normal;flex:none}
+#sheet .docs .y i{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+#sheet .notes{font-size:15.5px;line-height:1.55;margin-top:8px}
+#sheet .sig{display:flex;gap:22px;align-items:flex-end;border:1.5px solid var(--rule);border-radius:12px;padding:20px 22px}
+#sheet .sig img{max-height:66px;max-width:140px;object-fit:contain;align-self:center}
+#sheet .sig small{display:block;font-size:13px;color:var(--mut)}
+#sheet .sig b{display:block;font-size:21px;font-weight:800;margin:3px 0}
+#sheet .sig span{display:block;font-size:15px;margin-top:3px}
+#sheet .sig>div:not(.line){flex:1;min-width:0}
+#sheet .sig .line{margin-left:auto;width:200px;border-top:1.8px solid var(--tx);padding-top:8px;text-align:center;font-size:13.5px;color:var(--mut);flex:none}
+#sheet .ft{position:absolute;left:56px;right:56px;bottom:30px;display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut);border-top:1.5px solid var(--rule);padding-top:10px}
+#sheet.d-dark img{background:#fff;border-radius:10px;padding:6px}
 </style>
 </head>
 <body>
@@ -530,7 +531,7 @@ function drawQs(){
         <div class="chips mt8">${['MT','BBL','CBM','Litres','Gallons'].map(u=>`<button class="chip ${!unk&&q.u===u?'on':''}" data-qu="${f.id}" data-o="${u}">${u}</button>`).join('')}</div>`;
     } else if(f.type==='prices'){
       const p=A.prices||{};
-      body=`<div class="pricegrid">${A.terms.filter(t=>t!==DK).map(t=>`<div class="pricerow"><b>${esc(termName(t,A))}</b><input inputmode="decimal" data-p="${t}" value="${esc(p[t])}" placeholder="${A.currency||'USD'} per ${A.per||'MT'}"></div>`).join('')||'<small class="hint">Pick a delivery term above.</small>'}</div>`;
+      body=`<div class="pricegrid">${A.terms.filter(t=>t!==DK).map(t=>`<div class="pricerow"><b>${esc(termName(t,A))}</b><input inputmode="decimal" data-p="${t}" value="${esc(p[t])}" placeholder="${A.currency||'USD'} per ${A.per||'MT'}"></div>`).join('')||'<small class="hint">Pick a delivery term above.</small>'}</div><div class="ptot" id="ptot">${totHTML()}</div>`;
     } else if(f.type==='logo'){
       body = (PROFILE.logo
         ? `<div class="logobox"><img src="${PROFILE.logo}" alt="logo"><label class="lbtn">Change<input type="file" id="logoIn" accept="image/*" hidden></label><button class="lbtn" id="logoRm">Remove</button></div>`
@@ -571,7 +572,7 @@ function drawQs(){
   box.querySelectorAll('[data-qu]').forEach(b=>b.onclick=()=>{const id=b.dataset.qu;const q=(A[id]&&typeof A[id]==='object')?A[id]:{n:''};q.u=b.dataset.o;A[id]=q;
     if(!A._perSet){ const m={MT:'MT',BBL:'BBL',CBM:'CBM',Litres:'Litre',Gallons:'Gallon'}[q.u]; if(m) A.per=m; }
     save();drawQs()});
-  box.querySelectorAll('[data-p]').forEach(i=>i.oninput=()=>{A.prices=A.prices||{};A.prices[i.dataset.p]=i.value;save()});
+  box.querySelectorAll('[data-p]').forEach(i=>i.oninput=()=>{A.prices=A.prices||{};A.prices[i.dataset.p]=i.value;save(); const pt=$('#ptot'); if(pt) pt.innerHTML=totHTML();});
   box.querySelectorAll('.fileIn').forEach(fi=>fi.onchange=()=>{ let skipped=0; for(const f of fi.files){ if(S.files.length>=MAXF){skipped++;continue} if(f.size>8*1024*1024){toast(`${f.name} is over 8 MB — send it by WhatsApp instead`);continue} S.files.push(f) } if(skipped) toast(`Maximum ${MAXF} files — ${skipped} not added`,3500); drawQs(); });
   box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{S.files.splice(+b.dataset.rm,1);drawQs()});
 }
@@ -601,6 +602,8 @@ function customEntries(){
   }));
   return out;
 }
+function totHTML(){ const A=S.ans, cur=A.currency||'USD', T=totals(A); if(!T.length) return A.qty&&num(A.qty.n)?'':'<small class="hint">Add the quantity (stage 3) to see the total value.</small>';
+  return `<small>Total value for ${esc(fmt({id:'qty',type:'qty'},A))}</small>`+T.map(x=>`<div><span>${esc(x.term)}</span><b>${x.total!=null?money(x.total,cur):'n/a'}</b></div>`).join('')+(T.some(x=>x.total==null)?`<small>Can't calculate: ${esc(T.find(x=>x.total==null).why)}.</small>`:''); }
 function sections(){
   const A=S.ans, out=[];
   STAGES.forEach((st,i)=>{
@@ -609,6 +612,7 @@ function sections(){
     { const lg=rows.findIndex(r=>r.k==='Company logo'); if(lg>-1) rows.splice(lg,1); }
     if(i===0){ const gl=(cat().fields.find(f=>f.id==='grade')||{}).label; rows.forEach(r=>{ if(r.k===gl) r.k='Product name / grade'; }); rows.unshift({k:'Product',v:cat().name}); }
     if(i===4) rows.push({k:'Attached files',v:S.files.map(f=>f.name).join(', ')});
+    if(i===3){ const tv=totalText(A); if(tv){ const pi=rows.findIndex(r=>r.k==='Prices'); rows.splice(pi<0?rows.length:pi+1,0,{k:'Total value',v:tv}); } }
     out.push({title:st.title, bg:i===0?cat().bg:st.bg, rows, i});
   });
   return out;
@@ -626,6 +630,7 @@ function renderReview(app){
    ${topbar(`<button class="circ" id="bk" aria-label="Back">${back}</button><div style="margin:0 auto;text-align:center"><h4>Review offer</h4><small>${ref}</small></div><span style="width:52px"></span>`)}
    <h1 class="hero" style="font-size:36px">${esc(productTitle())}</h1>
    <p class="lede"><b>Product:</b> ${esc(cat().name)}${productTitle()!==cat().name?' · '+esc(productTitle()):''}<br>Check the details, then send.</p>
+   ${totals().length?`<div class="totcard">${totHTML()}</div>`:''}
    <div class="score"><b>${sc}%</b><p>of the offer details are filled in. ${sc<50?'Fewer details means slower checking — add vessel, documents or price if you can.':'Good — this is enough to start checking.'}</p></div>
    ${sections().map(s=>`<div class="sum"><h3><i style="width:12px;height:12px;border-radius:50%;background:${s.bg};border:1px solid #0002;margin-right:8px;display:inline-block"></i>${s.title}<button data-edit="${s.i}">Edit</button></h3>
      <dl class="kv">${s.rows.map(r=>`<dt>${esc(r.k)}</dt><dd class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</dd>`).join('')}</dl></div>`).join('')}
@@ -652,51 +657,122 @@ function renderReview(app){
   $('#bar').hidden=true;
 }
 
-/* ---------------- PDF ---------------- */
-function buildSheet(){
-  const c=cat(), A=S.ans, sc=completeness();
-  const p=A.prices||{}, dest=(A.destination&&A.destination!==DK)?A.destination:'';
-  const prices=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`<div>${esc(termName(t,A))}${dest&&['CIF','CFR','DAP'].includes(t)?' '+esc(dest):''} · ${A.currency||'USD'} ${esc(nice(p[t]))} / ${A.per||'MT'}</div>`).join('');
-  const v=id=>{const x=fmt({id,type:''},A);return x&&x!==DK?x:''};
-  const co=v('company'), nm=v('cname'), when=new Date().toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'});
+/* ---------------- PDF / JPG (formal A4 pages) ---------------- */
+const L_PER={BBL:158.987,CBM:1000,Litre:1,Litres:1,Gallon:3.78541,Gallons:3.78541};
+const unitN=u=>({Litres:'Litre',Gallons:'Gallon'}[u]||u);
+function convQty(n,from,to){ from=unitN(from); to=unitN(to); if(from===to) return n; if(L_PER[from]&&L_PER[to]) return n*L_PER[from]/L_PER[to]; return null; }
+const num=x=>{ const n=parseFloat(String(x==null?'':x).replace(/,/g,'').replace(/[^\d.]/g,'')); return isFinite(n)?n:0; };
+const money=(x,cur)=>`${cur} ${Math.round(x).toLocaleString('en-US')}`;
+function totals(A=S.ans, qid='qty'){
+  const q=A[qid]; if(!q||typeof q!=='object'||!num(q.n)) return [];
+  const cur=A.currency||'USD', per=A.per||'MT', qq=convQty(num(q.n),q.u||'MT',per), p=A.prices||{};
+  return (A.terms||[]).filter(t=>t!==DK&&num(p[t])).map(t=>({term:termName(t,A), t, price:num(p[t]),
+    total: qq!=null ? qq*num(p[t]) : null, why: qq==null ? `quantity is in ${q.u}, price is per ${per}` : ''}));
+}
+function totalText(A=S.ans){
+  const cur=A.currency||'USD', T=totals(A); if(!T.length) return '';
+  let s=T.map(x=>`${x.term} ${x.total!=null?money(x.total,cur):'n/a ('+x.why+')'}`).join(' · ');
+  if(/contract/.test(A.contract||'')){ const M=totals(A,'monthly'); if(M.length) s+=' | per month: '+M.map(x=>`${x.term} ${x.total!=null?money(x.total,cur):'n/a'}`).join(' · '); }
+  return s;
+}
+let LAST_UNMERGED=[];
+const mergeable=f=>/pdf$/i.test(f.type||'')||/\.pdf$/i.test(f.name)||/^image\//i.test(f.type||'')||/\.(jpe?g|png|heic|webp)$/i.test(f.name);
+function sheetBlocks(){
+  const c=cat(), A=S.ans, v=id=>{const x=fmt({id,type:''},A);return x&&x!==DK?x:''};
+  const co=v('company'), nm=v('cname'), when=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const contacts=[v('phone'),v('email'),v('website')].filter(Boolean).join(' · ');
-  const lhead=(PROFILE.logo||co)
-    ? `<div class="sh-top lh">${PROFILE.logo?`<img class="lg" src="${PROFILE.logo}">`:''}<div><h1>${esc(co||nm)}</h1><p>${esc([v('address'),contacts].filter(Boolean).join(' · '))}</p></div><div class="sh-ref"><b>OFFICIAL OFFER</b>${ref}<br>${when}</div></div>`
-    : `<div class="sh-top"><div class="m">${drop}</div><div><h1>${esc(CONFIG.brandName)}</h1><p>Oil offer sheet</p></div><div class="sh-ref"><b>${ref}</b>${when}</div></div>`;
-  const sig=`<div class="box full sig"><div class="sigrow">${PROFILE.logo?`<img src="${PROFILE.logo}">`:''}<div><small>Issued for and on behalf of</small><b>${esc(co||nm||'—')}</b>${nm?`<span>${esc([nm,v('role')].filter(Boolean).join(', '))}</span>`:''}${contacts?`<span>${esc(contacts)}</span>`:''}${v('address')?`<span>${esc(v('address'))}</span>`:''}</div><div class="sigline">Signature &amp; stamp</div></div>${v('notes')?`<p class="notes"><b>Notes:</b> ${esc(v('notes'))}</p>`:''}</div>`;
-  const pline=[v('basis'),v('platts'),v('discount')&&('premium/discount '+v('discount')),/^Yes/.test(A.commission||'')&&('broker commission '+(v('commamt')||'')+(/top/.test(A.commission)?' on top':' included'))].filter(Boolean).join(' · ');
-  const cdoc=(A.documents||[]).includes('__other')&&A.documents_other?`<span class="y">✓ ${esc(A.documents_other)}</span>`:'';
-  const docs=cdoc+optsOf(STAGES[4].fields[0],4).map(o=>`<span class="${(A.documents||[]).includes(o)?'y':''}">${(A.documents||[]).includes(o)?'✓ ':''}${esc(o)}</span>`).join('');
-  const secs=sections();
-  const box=(s,full)=>`<div class="box ${full?'full':''}"><h3><i style="background:${s.bg};border:1px solid #0002"></i>${s.title}</h3><table>${s.rows.filter(r=>r.k!=='Documents the seller has').map(r=>`<tr><td>${esc(r.k)}</td><td class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</td></tr>`).join('')}</table></div>`;
-  $('#sheet').innerHTML=`
-   ${lhead}
-   <div class="sh-hero ${c.dark?'dark':''}" style="background:${c.bg};color:${c.fg};${c.bg==='#FFFFFF'?'border:1.5px solid #D9D3C5':''}">
-     <div><span class="tag">${esc(c.name)}</span><h2>${esc(productTitle())}</h2><div style="font-size:14px;font-weight:600">${esc([fmt({id:'origin',type:'chips'},A),fmt({id:'qty',type:'qty'},A),A.where].filter(x=>x&&x!==DK).join(' · '))}</div></div>
-     ${prices?`<div class="prices">${prices}${pline?`<small>${esc(pline)}</small>`:''}</div>`:''}</div>
-   <div class="grid">
-     ${box(secs[0])}${box(secs[1])}${box(secs[2])}${box(secs[3])}
-     <div class="box full"><h3><i style="background:#CDD97A;border:1px solid #0002"></i>Documents the seller has</h3><div class="docs">${docs}</div>
-       <table style="margin-top:10px"><tr><td>Attached files</td><td>${esc(S.files.map(f=>f.name).join(', ')||'—')}</td></tr><tr><td>Key spec values</td><td>${esc(A.spec||'—')}</td></tr></table></div>
-     ${sig}
-   </div>
-   <div class="foot"><span>Submitted via petromad.space · ${sc}% complete</span><span>${ref}</span></div>`;
+  const cur=A.currency||'USD', per=A.per||'MT', T=totals(A), dest=v('destination'), lp=v('loadport');
+  const B=[];
+  B.push(`<div class="lhd">${PROFILE.logo?`<img src="${PROFILE.logo}" alt="">`:`<div class="mk">${drop}</div>`}<div><h1>${esc(co||nm||CONFIG.brandName)}</h1><p>${esc([v('address'),contacts].filter(Boolean).join(' · ')||'Oil product offer')}</p></div><div class="rf"><b>OFFICIAL OFFER</b>Ref. ${ref}<br>${when}</div></div>`);
+  B.push(`<div class="ttl"><div class="eb">${esc(c.name.toUpperCase())} · COMMERCIAL OFFER</div><h2>${esc(productTitle())}</h2>${v('validity')?`<p>Offer valid until <b>${esc(fmt({id:'validity',type:'date'},A))}</b></p>`:''}</div>`);
+  const kf=[['Product',productTitle()],['Quantity',v('qty')],['Origin',v('origin')],['Location',[v('where'),lp].filter(Boolean).join(' · ')]];
+  B.push(`<div class="kf">${kf.map(([k,x])=>`<div><small>${k}</small><b>${esc(x||'—')}</b></div>`).join('')}</div>`);
+  if(T.length){
+    const delivery=t=>['CIF','CFR','DAP'].includes(t)?(dest||'Destination n/a'):(lp||'Loading port');
+    const notes=[[v('basis'),v('platts'),v('discount')&&('premium / discount '+v('discount'))].filter(Boolean).join(' · '),
+      /^Yes/.test(A.commission||'')?`Broker commission: ${v('commamt')||'amount n/a'} (${/top/.test(A.commission)?'on top of the price':'included in the price'})`:(A.commission==='No commission'?'No broker commission':''),
+      v('payment')&&('Payment: '+v('payment')), v('procedure')&&('Procedure: '+v('procedure'))].filter(Boolean);
+    const M=/contract/.test(A.contract||'')?totals(A,'monthly'):[];
+    B.push(`<div><h3>Price &amp; total value</h3><table class="pt"><tr><th>Term</th><th>Delivery</th><th class="n">Unit price</th><th class="n">Total value</th></tr>
+      ${T.map(x=>`<tr><td>${esc(x.term)}</td><td>${esc(delivery(x.t))}</td><td class="n">${cur} ${esc(x.price.toLocaleString('en-US',{minimumFractionDigits:x.price%1?2:0,maximumFractionDigits:2}))} / ${per}</td><td class="n tv">${x.total!=null?money(x.total,cur):'<span class="na">n/a</span>'}</td></tr>`).join('')}
+      </table><p class="pnote">Based on ${esc(v('qty'))}${T.some(x=>x.total==null)?` · total not calculated: ${esc(T.find(x=>x.total==null).why)}`:''}${M.length&&M[0].total!=null?` · per month (${esc(v('monthly'))}): <b>${money(M[0].total,cur)}</b> ${esc(M[0].term)}`:''}</p>
+      ${notes.length?`<div class="pnote">${notes.map(n=>`<div>${esc(n)}</div>`).join('')}</div>`:''}</div>`);
+  }
+  const skip=new Set(['Product','Prices','Total value','Delivery terms','Currency','Price per','Price basis','Platts benchmark','Discount / premium','Broker commission','Commission amount','Payment terms','Procedure','Valid until']);
+  sections().slice(0,4).forEach(s=>{
+    const rows=s.rows.filter(r=>!skip.has(r.k)), have=rows.filter(r=>r.v&&r.v!==DK), miss=rows.filter(r=>!r.v||r.v===DK).map(r=>r.k);
+    if(!have.length&&!miss.length) return;
+    const tr=[]; for(let i=0;i<have.length;i+=2){ const a=have[i], b=have[i+1]; tr.push(`<tr><td class="k">${esc(a.k)}</td><td class="v">${esc(a.v)}</td>${b?`<td class="k">${esc(b.k)}</td><td class="v">${esc(b.v)}</td>`:'<td></td><td></td>'}</tr>`); }
+    B.push(`<div><h3>${esc(s.title)}</h3>${tr.length?`<table class="skv">${tr.join('')}</table>`:''}${miss.length?`<p class="miss">Not provided: ${esc(miss.join(', '))}</p>`:''}</div>`);
+  });
+  const dsel=A.documents||[], dl=optsOf(STAGES[4].fields[0],4).concat(dsel.includes('__other')&&A.documents_other?[A.documents_other]:[]);
+  const has=o=>dsel.includes(o)||o===A.documents_other;
+  B.push(`<div><h3>Documents the seller holds</h3><div class="docs">${dl.map(o=>`<span class="${has(o)?'y':''}"><i>${has(o)?'✓':''}</i>${esc(o)}</span>`).join('')}</div></div>`);
+  if(S.files.length||v('spec')) B.push(`<div><h3>Specification &amp; attachments</h3>${v('spec')?`<p class="notes">${esc(v('spec'))}</p>`:''}${S.files.length?`<table class="skv">${S.files.map((f,i)=>`<tr><td class="k">Attachment ${i+1}</td><td class="v" colspan="3">${esc(f.name)} <span class="na">· ${mergeable(f)?'included at the end of this PDF':'sent as a separate file'}</span></td></tr>`).join('')}</table>`:''}</div>`);
+  B.push(`<div class="sig">${PROFILE.logo?`<img src="${PROFILE.logo}" alt="">`:''}<div><small>Issued for and on behalf of</small><b>${esc(co||nm||'—')}</b>${nm?`<span>${esc([nm,v('role')].filter(Boolean).join(', '))}</span>`:''}${contacts?`<span>${esc(contacts)}</span>`:''}${v('address')?`<span>${esc(v('address'))}</span>`:''}</div><div class="line">Signature &amp; company stamp</div></div>${v('notes')?`<p class="notes" style="margin-top:12px"><b>Notes:</b> ${esc(v('notes'))}</p>`:''}`);
+  return {B, co:co||nm||CONFIG.brandName};
+}
+async function layoutSheet(){
+  const el=$('#sheet'), c=cat(), {B,co}=sheetBlocks();
+  const light=['#FFC83D','#CDD97A','#FFFFFF'].includes((c.bg||'').toUpperCase());
+  el.className='d-'+DESIGN;
+  el.style.setProperty('--cat', c.bg==='#FFFFFF'?'#141414':c.bg); el.style.setProperty('--cattx', light?'#141414':c.bg); el.style.setProperty('--oncat', light||c.bg==='#FFFFFF'?'#141414':'#fff');
+  el.innerHTML=`<div class="pg"><div class="ms">${B.map(b=>`<div class="blk">${b}</div>`).join('')}</div></div>`;
+  await document.fonts.ready;
+  await Promise.all([...el.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
+  const hs=[...el.querySelectorAll('.ms>.blk')].map(b=>b.getBoundingClientRect().height+20);
+  const FULL=1123-50-66, RH=46; const pages=[[]]; let used=0, avail=FULL;
+  hs.forEach((h,i)=>{ if(used+h>avail&&pages[pages.length-1].length){ pages.push([]); used=0; avail=FULL-RH; } pages[pages.length-1].push(i); used+=h; });
+  { const L=pages.length; if(L>1&&pages[L-1].length===1&&pages[L-2].length>1) pages[L-1].unshift(pages[L-2].pop()); }
+  el.innerHTML=pages.map((pg,k)=>`<div class="pg">${k?`<div class="rhd"><b>${esc(co)}</b><span>${esc(productTitle())} · Ref. ${ref}</span></div>`:''}${pg.map(i=>`<div class="blk">${B[i]}</div>`).join('')}<div class="ft"><span>Ref. ${ref}</span><span>Page ${k+1} of ${pages.length}</span><span>petromad.space</span></div></div>`).join('');
+  await Promise.all([...el.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
+}
+function buildSheet(){ return layoutSheet(); }
+async function fileToJpeg(f){
+  const url=URL.createObjectURL(f);
+  try{ const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const k=Math.min(1,2000/Math.max(img.naturalWidth,img.naturalHeight)), cv=document.createElement('canvas');
+    cv.width=Math.round(img.naturalWidth*k); cv.height=Math.round(img.naturalHeight*k); const x=cv.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,cv.width,cv.height); x.drawImage(img,0,0,cv.width,cv.height);
+    return {bytes:new Uint8Array(await (await new Promise(r=>cv.toBlob(r,'image/jpeg',.88))).arrayBuffer()), w:cv.width, h:cv.height};
+  } finally { URL.revokeObjectURL(url); }
+}
+async function mergeAttachments(buf){
+  LAST_UNMERGED=S.files.filter(f=>!mergeable(f));
+  if(!window.PDFLib||!S.files.some(mergeable)) { if(!window.PDFLib) LAST_UNMERGED=[...S.files]; return new Blob([buf],{type:'application/pdf'}); }
+  const {PDFDocument,StandardFonts,rgb}=PDFLib, doc=await PDFDocument.load(buf), font=await doc.embedFont(StandardFonts.HelveticaBold);
+  let n=0;
+  for(const f of S.files){ n++; if(!mergeable(f)) continue;
+    try{
+      const label=`Attachment ${n}  -  ${f.name}`.replace(/[^\x20-\x7E]/g,'?').slice(0,95);
+      if(/pdf$/i.test(f.type||'')||/\.pdf$/i.test(f.name)){
+        const src=await PDFDocument.load(new Uint8Array(await f.arrayBuffer()),{ignoreEncryption:true});
+        (await doc.copyPages(src,src.getPageIndices())).forEach(p=>{ doc.addPage(p); const {width,height}=p.getSize(); p.drawText(label,{x:24,y:height-16,size:8,font,color:rgb(.45,.45,.45)}); });
+      } else {
+        const j=await fileToJpeg(f), img=await doc.embedJpg(j.bytes), W=595.28, H=841.89, m=36, top=64;
+        const pg=doc.addPage([W,H]); pg.drawText(label,{x:m,y:H-40,size:11,font,color:rgb(.2,.2,.2)});
+        pg.drawLine({start:{x:m,y:H-50},end:{x:W-m,y:H-50},thickness:.8,color:rgb(.8,.78,.74)});
+        const s=Math.min((W-2*m)/j.w,(H-top-m)/j.h); const w=j.w*s, h=j.h*s; pg.drawImage(img,{x:(W-w)/2,y:m+((H-top-m)-h)/2,width:w,height:h});
+      }
+    }catch(e){ console.warn('attachment not merged',f.name,e); LAST_UNMERGED.push(f); }
+  }
+  return new Blob([await doc.save()],{type:'application/pdf'});
 }
 const makeJpg=()=>makePdf(true);
 async function makePdf(asImage){
   if(typeof html2canvas==='undefined'||!window.jspdf){toast('PDF tool is still loading — try again in a moment');throw new Error('no pdf lib')}
-  buildSheet(); await document.fonts.ready;
-  const el=$('#sheet'), old=el.getAttribute('style')||'', y=window.scrollY; el.className='d-'+DESIGN;
-  // render the sheet in the page (behind the app) so the capture is not blank
-  el.setAttribute('style','position:absolute;left:0;top:0;z-index:-1;');
-  await Promise.all([...el.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
+  await layoutSheet();
+  const el=$('#sheet'), old=el.getAttribute('style')||'', y=window.scrollY;
+  el.setAttribute('style', old.replace(/position:[^;]+;?|left:[^;]+;?|top:[^;]+;?|z-index:[^;]+;?/g,'')+';position:absolute;left:0;top:0;z-index:-1;'); window.scrollTo(0,0);
   try{
-    const W=794, H=el.scrollHeight, sc=Math.min(2, Math.sqrt(14e6/(W*H)));
-    const canvas=await html2canvas(el,{scale:sc,backgroundColor:(DESIGNS.find(d=>d[0]===DESIGN)||DESIGNS[0])[2],width:W,height:H,windowWidth:W,scrollX:0,scrollY:0,useCORS:true,logging:false});
-    if(asImage) return await new Promise(r=>canvas.toBlob(r,'image/jpeg',.92));
-    const {jsPDF}=window.jspdf; const pdf=new jsPDF({unit:'px',format:[W,H],orientation:H>W?'p':'l',hotfixes:['px_scaling']});
-    pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',0,0,W,H);
-    return pdf.output('blob');
+    const pages=[...el.querySelectorAll('.pg')], bg=getComputedStyle(pages[0]).backgroundColor, W=794, H=1123;
+    const sc=Math.min(2, Math.sqrt(15e6/(W*H*(asImage?pages.length:1))));
+    const cv=[]; for(const p of pages) cv.push(await html2canvas(p,{scale:sc,backgroundColor:bg,width:W,height:H,windowWidth:W,scrollX:0,scrollY:0,useCORS:true,logging:false}));
+    if(asImage){ const gap=Math.round(16*sc), out=document.createElement('canvas'); out.width=cv[0].width; out.height=cv.reduce((a,c)=>a+c.height,0)+gap*(cv.length-1);
+      const x=out.getContext('2d'); x.fillStyle='#9A958B'; x.fillRect(0,0,out.width,out.height); let yy=0; cv.forEach(c=>{x.drawImage(c,0,yy); yy+=c.height+gap;});
+      LAST_UNMERGED=[...S.files]; return await new Promise(r=>out.toBlob(r,'image/jpeg',.9)); }
+    const {jsPDF}=window.jspdf; const pdf=new jsPDF({unit:'px',format:[W,H],orientation:'p',hotfixes:['px_scaling']});
+    cv.forEach((c,i)=>{ if(i) pdf.addPage([W,H],'p'); pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',0,0,W,H); });
+    return await mergeAttachments(pdf.output('arraybuffer'));
   } finally { el.setAttribute('style',old); window.scrollTo(0,y); }
 }
 function saveBlob(b,name){ const u=URL.createObjectURL(b); const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000); }
@@ -822,7 +898,7 @@ async function sendEmail(){
   if(CONFIG.scriptUrl){
     try{
       const files=[{name:ref+'.pdf',mime:'application/pdf',data:await toB64(pdf)}];
-      for(const f of S.files) files.push({name:f.name,mime:f.type||'application/octet-stream',data:await toB64(f)});
+      for(const f of LAST_UNMERGED) files.push({name:f.name,mime:f.type||'application/octet-stream',data:await toB64(f)});
       const r=await fetch(CONFIG.scriptUrl,{method:'POST',body:JSON.stringify({...o,files})});
       const j=await r.json(); if(!j.ok) throw new Error(j.error||'failed');
       return finishSent();
@@ -844,7 +920,7 @@ function sendFormSubmit(pdf){
   sections().forEach(s=>s.rows.forEach(r=>add(`${s.title} — ${r.k}`, r.v||'—')));
   add('Completeness',completeness()+'%');
   const cu=customEntries(); if(cu.length){ add('★ NEW OPTIONS to add to the app', cu.map(c=>`${c.q}: ${c.v}`).join(' | ')); f.querySelector('[name=_subject]').value+=' ★ new options'; }
-  const allFiles=[new File([pdf],ref+'.pdf',{type:'application/pdf'}),...S.files];
+  const allFiles=[new File([pdf],ref+'.pdf',{type:'application/pdf'}),...LAST_UNMERGED];
   allFiles.forEach((file,i)=>{const inp=document.createElement('input');inp.type='file';inp.name='attachment'+(i+1);const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;f.appendChild(inp)});
   document.body.appendChild(f);
   $('#fsframe').onload=()=>{f.remove(); finishSent();};
