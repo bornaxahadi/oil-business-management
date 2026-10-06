@@ -90,6 +90,11 @@ textarea.f{min-height:90px;resize:vertical}
 .pricerow b{width:62px;font-size:14px}
 .pricerow input{flex:1;border:0;background:#fff;border-radius:11px;padding:11px 12px;font-size:16px;font-weight:600;min-width:0}
 .files{border:2px dashed var(--line);border-radius:var(--r-md);padding:18px;text-align:center;display:block;font-weight:600}
+.fbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fbtns .files{padding:16px 8px;font-size:22px}
+.fbtns .files b{display:block;font-size:15px;margin-top:4px}
+.fbtns.full .files{opacity:.4}
+.fcount{display:block;margin-top:8px}
 .files small{display:block;color:var(--muted);font-weight:500;margin-top:4px}
 .flist{margin-top:10px;display:grid;gap:6px}
 .flist div{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:12px;padding:9px 12px;font-size:14px}
@@ -306,6 +311,7 @@ const STAGES = [
 let S = {cat:null, ans:{}, files:[]};
 let view = 'home', step = 0, ref = '';
 const $ = s=>document.querySelector(s);
+const MAXF = 6;
 const esc = v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const save=()=>{try{localStorage.setItem('oilOfferDraft',JSON.stringify({cat:S.cat,ans:S.ans}))}catch(e){}};
 const load=()=>{try{const d=JSON.parse(localStorage.getItem('oilOfferDraft')||'null');if(d&&d.cat){S.cat=d.cat;S.ans=d.ans||{}}}catch(e){}};
@@ -398,7 +404,10 @@ function drawQs(){
       const p=A.prices||{};
       body=`<div class="pricegrid">${A.terms.filter(t=>t!==DK).map(t=>`<div class="pricerow"><b>${esc(termName(t,A))}</b><input inputmode="decimal" data-p="${t}" value="${esc(p[t])}" placeholder="${A.currency||'USD'} per ${A.per||'MT'}"></div>`).join('')||'<small class="hint">Pick a delivery term above.</small>'}</div>`;
     } else if(f.type==='files'){
-      body=`<label class="files">📎 Tap to attach files<small>Spec sheet, SGS, Q88, photos, PDF — max ~5 MB each</small><input type="file" id="fileIn" multiple hidden accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx,.xls,.xlsx"></label>
+      const full=S.files.length>=MAXF;
+      body=`<div class="fbtns ${full?'full':''}"><label class="files">📄<b>Files & PDF</b><small>PDF, Word, Excel</small><input type="file" class="fileIn" multiple hidden ${full?'disabled':''} accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,application/pdf"></label>
+        <label class="files">📷<b>Photos</b><small>Gallery or camera</small><input type="file" class="fileIn" multiple hidden ${full?'disabled':''} accept="image/*"></label></div>
+        <small class="hint fcount">${S.files.length} of ${MAXF} files added · max 8 MB each</small>
         <div class="flist">${S.files.map((x,i)=>`<div><span>${esc(x.name)}</span><small>${(x.size/1024/1024).toFixed(1)} MB</small><button data-rm="${i}" aria-label="Remove">✕</button></div>`).join('')}</div>`;
     }
     return `<div class="q"><div class="qh"><label>${esc(f.label)}${f.required?' *':''}</label>${f.hint?`<span class="hint">${esc(f.hint)}</span>`:''}${dkBtn}</div>${body}</div>`;
@@ -419,7 +428,7 @@ function drawQs(){
   box.querySelectorAll('[data-qn]').forEach(i=>i.oninput=()=>{const id=i.dataset.qn;const q=(A[id]&&typeof A[id]==='object')?A[id]:{u:'MT'};q.n=i.value;A[id]=q;save()});
   box.querySelectorAll('[data-qu]').forEach(b=>b.onclick=()=>{const id=b.dataset.qu;const q=(A[id]&&typeof A[id]==='object')?A[id]:{n:''};q.u=b.dataset.o;A[id]=q;save();drawQs()});
   box.querySelectorAll('[data-p]').forEach(i=>i.oninput=()=>{A.prices=A.prices||{};A.prices[i.dataset.p]=i.value;save()});
-  const fi=$('#fileIn'); if(fi) fi.onchange=()=>{ for(const f of fi.files){ if(f.size>8*1024*1024){toast(`${f.name} is over 8 MB — send it by WhatsApp instead`);continue} S.files.push(f) } drawQs(); };
+  box.querySelectorAll('.fileIn').forEach(fi=>fi.onchange=()=>{ let skipped=0; for(const f of fi.files){ if(S.files.length>=MAXF){skipped++;continue} if(f.size>8*1024*1024){toast(`${f.name} is over 8 MB — send it by WhatsApp instead`);continue} S.files.push(f) } if(skipped) toast(`Maximum ${MAXF} files — ${skipped} not added`,3500); drawQs(); });
   box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{S.files.splice(+b.dataset.rm,1);drawQs()});
 }
 
