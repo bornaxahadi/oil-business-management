@@ -18,6 +18,13 @@
   --purple:#6A4CF5; --yellow:#FFC83D; --lime:#CDD97A; --red:#D8483E; --white:#fff;
   --r-xl:34px; --r-lg:24px; --r-md:18px;
 }
+html[data-theme=sky]{--bg:#E3EBF1;--soft:#F1F5F8;--line:#C7D3DC;--muted:#5C6973}
+html[data-theme=dark]{--bg:#121212;--ink:#F1EEE7;--soft:#272727;--line:#3A3A3A;--muted:#A8A294;--white:#1E1E1E;color-scheme:dark}
+html[data-theme=dark] .cat.dark{background:#2C2C2C!important}
+html[data-theme=dark] #resume{background:var(--white)!important}
+html[data-theme=dark] .chip.cust{color:#5BD07F;border-color:#3FB765}
+html[data-theme=dark] .sbtn:not([style*="color"]){color:#1B1B1B}
+html[data-theme=dark] .stagecard{box-shadow:inset 0 0 0 1px #ffffff14}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -29,7 +36,7 @@ button{cursor:pointer;border:0;background:none}
 
 /* top bar */
 .top{display:flex;align-items:center;gap:12px;margin:6px 0 22px}
-.mark{width:52px;height:52px;border-radius:50%;background:var(--ink);display:grid;place-items:center;flex:none}
+.mark{color:var(--white);width:52px;height:52px;border-radius:50%;background:var(--ink);display:grid;place-items:center;flex:none}
 .mark svg{width:24px;height:24px}
 .top h4{font-size:17px;font-weight:700;line-height:1.1}
 .top small{color:var(--muted);font-size:13px}
@@ -74,14 +81,14 @@ button{cursor:pointer;border:0;background:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:10px 15px;border-radius:99px;background:var(--soft);border:1.5px solid var(--soft);font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:7px}
 .chip.on{background:var(--ink);color:var(--white);border-color:var(--ink)}
-.chip.cust{border:2px dotted #22A04B;color:#16803A;background:#fff}
+.chip.cust{border:2px dotted #22A04B;color:#16803A;background:var(--white)}
 .chip.cust.on{background:#22A04B;color:#fff;border:2px solid #22A04B}
 .chip.unk{border:1.5px dashed var(--muted);background:transparent;color:var(--muted)}
-.chip.unk.on{background:var(--ink);color:#fff;border-style:solid;border-color:var(--ink)}
+.chip.unk.on{background:var(--ink);color:var(--white);border-style:solid;border-color:var(--ink)}
 .chip .sw{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.2)}
 .chip.on .tick::before{content:'✓'}
 input.f,textarea.f,select.f{width:100%;background:var(--soft);border:1.5px solid transparent;border-radius:14px;padding:13px 14px;font-size:16px;font-weight:500}
-input.f:focus,textarea.f:focus{border-color:var(--ink);outline:none;background:#fff}
+input.f:focus,textarea.f:focus{border-color:var(--ink);outline:none;background:var(--white)}
 input.f:disabled{opacity:.5}
 textarea.f{min-height:90px;resize:vertical}
 .row{display:flex;gap:8px}
@@ -90,23 +97,34 @@ textarea.f{min-height:90px;resize:vertical}
 .pricegrid{display:grid;gap:8px}
 .pricerow{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:14px;padding:4px 4px 4px 14px}
 .pricerow b{width:62px;font-size:14px}
-.pricerow input{flex:1;border:0;background:#fff;border-radius:11px;padding:11px 12px;font-size:16px;font-weight:600;min-width:0}
+.pricerow input{flex:1;border:0;background:var(--white);border-radius:11px;padding:11px 12px;font-size:16px;font-weight:600;min-width:0}
 .files{border:2px dashed var(--line);border-radius:var(--r-md);padding:18px;text-align:center;display:block;font-weight:600}
 .perks{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
-.perks span{background:#fff;border-radius:99px;padding:7px 12px;font-size:13px;font-weight:600}
+.perks span{background:var(--white);border-radius:99px;padding:7px 12px;font-size:13px;font-weight:600}
 .prices small{display:block;font-size:11px;font-weight:600;opacity:.8;max-width:260px;text-align:right;margin-top:2px}
-.logobox{display:flex;align-items:center;gap:10px;background:#F6F3EC;border-radius:16px;padding:12px}
+.logobox{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:16px;padding:12px}
 .logobox img{max-height:56px;max-width:130px;object-fit:contain;background:#fff;border-radius:10px;padding:6px;margin-right:auto}
-.lbtn{font:700 13px 'Urbanist',sans-serif;background:#fff;border:0;border-radius:99px;padding:9px 14px;cursor:pointer;color:#1B1B1B}
+.lbtn{font:700 13px 'Urbanist',sans-serif;background:var(--white);border:0;border-radius:99px;padding:9px 14px;cursor:pointer;color:var(--ink)}
 .logoup{font-size:22px}.logoup b{display:block;font-size:15px;margin-top:4px}
-.forget{display:block;margin-top:10px;font:600 12px 'Urbanist',sans-serif;color:#6E6A61;text-decoration:underline;background:none;border:0;padding:0;cursor:pointer}
+.forget{display:block;margin-top:10px;font:600 12px 'Urbanist',sans-serif;color:var(--muted);text-decoration:underline;background:none;border:0;padding:0;cursor:pointer}
+.dpick{background:var(--white);border-radius:var(--r-lg);padding:14px 14px 12px}
+.dph{display:flex;align-items:center;margin-bottom:10px}.dph b{font-size:16px}
+.dph button{margin-left:auto;background:var(--soft);border-radius:99px;padding:7px 12px;font-weight:700;font-size:13px}
+.dopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dopt{display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:13px;padding:8px 4px;border-radius:16px;border:2px solid transparent}
+.dopt.on{border-color:var(--ink)}
+.dopt i{width:58px;height:76px;border-radius:6px;box-shadow:0 0 0 1px #0002;padding:6px 5px;display:flex;flex-direction:column;gap:4px}
+.dopt em{height:18px;border-radius:4px}.dopt u{height:12px;border-radius:3px;background:#8884}
+.pv{position:fixed;inset:0;z-index:50;background:#000d;overflow:auto;padding:calc(10px + env(safe-area-inset-top,0px)) 10px 30px}
+.pvbar{display:flex;align-items:center;color:#fff;margin-bottom:10px}.pvbar button{margin-left:auto;background:#fff;color:#1B1B1B;border-radius:99px;padding:8px 14px;font-weight:700}
+.pv img{width:100%;border-radius:10px;display:block}
 .minis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mini{background:#fff;border:0;border-radius:20px;padding:14px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
+.mini{background:var(--white);border:0;border-radius:20px;padding:14px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
 .mini b{display:block;font-size:16px}.mini small{display:block;font-size:12px;opacity:.7;margin-top:2px}
-.hist{background:#fff;border-radius:20px;padding:14px 14px 14px 16px;margin-bottom:10px;display:flex;gap:10px;align-items:center}
-.hist small{display:block;font-size:12px;color:#6E6A61}.hist b{display:block;font-size:19px;margin:2px 0}.hist span{display:block;font-size:13px;font-weight:600}
+.hist{background:var(--white);border-radius:20px;padding:14px 14px 14px 16px;margin-bottom:10px;display:flex;gap:10px;align-items:center}
+.hist small{display:block;font-size:12px;color:var(--muted)}.hist b{display:block;font-size:19px;margin:2px 0}.hist span{display:block;font-size:13px;font-weight:600}
 .hist .hb{margin-left:auto;display:flex;flex-direction:column;gap:6px}
-.hist .hb button{border:0;border-radius:99px;background:#F2EEE5;padding:7px 12px;font:700 12px 'Urbanist',sans-serif;cursor:pointer;color:var(--ink)}
+.hist .hb button{border:0;border-radius:99px;background:var(--soft);padding:7px 12px;font:700 12px 'Urbanist',sans-serif;cursor:pointer;color:var(--ink)}
 .fbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fbtns .files{padding:16px 8px;font-size:22px}
 .fbtns .files b{display:block;font-size:15px;margin-top:4px}
@@ -120,9 +138,9 @@ textarea.f{min-height:90px;resize:vertical}
 .err{color:var(--red);font-size:14px;font-weight:600;margin-top:8px}
 
 /* bottom bar */
-.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,rgba(238,234,224,0))}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent)}
 .bar .in{max-width:444px;margin:0 auto;display:flex;gap:10px}
-.btn{flex:1;height:58px;border-radius:99px;background:var(--ink);color:#fff;font-size:18px;font-weight:600}
+.btn{flex:1;height:58px;border-radius:99px;background:var(--ink);color:var(--white);font-size:18px;font-weight:600}
 .btn.ghost{background:var(--white);color:var(--ink);flex:0 0 58px}
 .btn:disabled{opacity:.5}
 
@@ -134,14 +152,14 @@ textarea.f{min-height:90px;resize:vertical}
 .kv dt{color:var(--muted);font-weight:500}
 .kv dd{font-weight:600;word-break:break-word}
 .kv dd.u{color:var(--muted);font-weight:500;font-style:italic}
-.score{display:flex;align-items:center;gap:14px;background:var(--ink);color:#fff;border-radius:var(--r-lg);padding:16px 18px;margin-bottom:12px}
+.score{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--white);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:12px}
 .score b{font-size:40px;font-weight:800;line-height:1}
 .score p{font-size:14px;opacity:.85}
 .send{display:grid;gap:10px;margin-top:6px}
 .sbtn{display:flex;align-items:center;gap:14px;border-radius:var(--r-lg);padding:16px 18px;text-align:left;width:100%;font-weight:700;font-size:18px}
 .sbtn small{display:block;font-size:13px;font-weight:500;opacity:.8}
 .sbtn .go{margin-left:auto;width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
-.sbtn .go svg{width:18px;height:18px;stroke:var(--ink)}
+.sbtn .go svg{width:18px;height:18px;stroke:#1B1B1B}
 .toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:99px;font-weight:600;font-size:15px;z-index:50;max-width:90vw;text-align:center}
 .done{text-align:center;padding-top:40px}
 .done .big{width:96px;height:96px;border-radius:50%;background:var(--lime);display:grid;place-items:center;margin:0 auto 18px;font-size:44px}
@@ -150,7 +168,7 @@ textarea.f{min-height:90px;resize:vertical}
 /* ================= PDF SHEET (off-screen) ================= */
 #sheet{position:fixed;left:-10000px;top:0;width:794px;background:#EEEAE0;font-family:'Urbanist',sans-serif;color:#1B1B1B;padding:34px}
 #sheet .sh-top{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-#sheet .sh-top .m{width:46px;height:46px;border-radius:50%;background:#1B1B1B;display:grid;place-items:center}
+#sheet .sh-top .m{color:#fff;width:46px;height:46px;border-radius:50%;background:#1B1B1B;display:grid;place-items:center}
 #sheet .sh-top h1{font-size:15px;font-weight:700}
 #sheet .sh-top p{font-size:12px;color:#6E6A61}
 #sheet .sh-ref{margin-left:auto;text-align:right;font-size:12px}
@@ -187,6 +205,25 @@ textarea.f{min-height:90px;resize:vertical}
 #sheet .sig .sigline{margin-left:auto;align-self:flex-end;border-top:1.5px solid #1B1B1B;padding-top:6px;width:190px;text-align:center;font-size:11px;color:#6E6A61}
 #sheet .sig .notes{font-size:12.5px;margin-top:12px}
 #sheet .sig .notes b{display:inline;font-size:12.5px;font-weight:700;margin:0}
+#sheet.d-letter{background:#fff}
+#sheet.d-letter .box{border:1px solid #E2DCCF;border-radius:10px}
+#sheet.d-letter .sh-hero{background:#fff!important;color:#1B1B1B!important;border:0!important;border-top:4px solid #1B1B1B!important;border-bottom:1px solid #1B1B1B!important;border-radius:0;padding:20px 2px 18px}
+#sheet.d-letter .sh-hero .tag{background:#1B1B1B;color:#fff}
+#sheet.d-letter .sh-hero .prices div{background:#F3F0E9}
+#sheet.d-letter .docs span{background:#F3F0E9}
+#sheet.d-letter .docs span.y{background:#1B1B1B;color:#fff}
+#sheet.d-letter .box h3 i{display:none}
+#sheet.d-dark{background:#111;color:#EEEAE2}
+#sheet.d-dark .box{background:#1E1E1E}
+#sheet.d-dark .box td:first-child,#sheet.d-dark .sh-top p,#sheet.d-dark .foot,#sheet.d-dark .sig small,#sheet.d-dark .sig .sigline{color:#9D978B}
+#sheet.d-dark .box td.u{color:#6F6A61}
+#sheet.d-dark .docs span{background:#2A2A2A;color:#E6E2DA}
+#sheet.d-dark .docs span.y{background:#EEEAE2;color:#111}
+#sheet.d-dark .sig .sigline{border-color:#EEEAE2}
+#sheet.d-dark .sh-top .m{background:#EEEAE2;color:#111}
+#sheet.d-dark .sh-hero{border:1px solid #ffffff2a}
+#sheet.d-dark .box h3 i{box-shadow:0 0 0 1px #ffffff55}
+#sheet.d-dark img.lg,#sheet.d-dark .sig img{background:#fff;border-radius:10px;padding:6px}
 #sheet .foot{margin-top:16px;font-size:11px;color:#6E6A61;display:flex;justify-content:space-between}
 </style>
 </head>
@@ -344,6 +381,11 @@ let S = {cat:null, ans:{}, files:[]};
 let view = 'home', step = 0, ref = '';
 const $ = s=>document.querySelector(s);
 const MAXF = 6;
+const THEMES=['cream','sky','dark']; let THEME=localStorage.getItem('oilTheme')||'cream';
+function setTheme(t){ THEME=t; document.documentElement.dataset.theme=t; try{localStorage.setItem('oilTheme',t)}catch(e){} }
+setTheme(THEME);
+let DESIGN=localStorage.getItem('oilDesign')||'colour';
+const DESIGNS=[['colour','Colour','#EEEAE0'],['letter','Letterhead','#FFFFFF'],['dark','Dark','#111111']];
 let LEARNED = {}; try{ LEARNED = JSON.parse(localStorage.getItem('oilLearned')||'{}') }catch(e){}
 const lkey = (i,f) => (i===0?S.cat:'*')+'|'+f.id;
 const optsOf = (f,i) => { const extra=(LEARNED[lkey(i,f)]||[]).filter(o=>!f.options.some(x=>x.toLowerCase()===o.toLowerCase())); return f.options.concat(extra); };
@@ -363,7 +405,7 @@ const fieldsFor = i=> i===0 ? cat().fields : STAGES[i].fields;
 const visible = (f)=>!f.showIf || f.showIf(S.ans);
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 const back = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>';
-const drop = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5c3.6 4.6 6.5 8.3 6.5 12a6.5 6.5 0 01-13 0c0-3.7 2.9-7.4 6.5-12z"/></svg>';
+const drop = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c3.6 4.6 6.5 8.3 6.5 12a6.5 6.5 0 01-13 0c0-3.7 2.9-7.4 6.5-12z"/></svg>';
 
 function toast(t,ms=2600){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),ms)}
 
@@ -383,7 +425,7 @@ function renderHome(app){
   $('#bar').hidden=true;
   const draft = S.cat && Object.keys(S.ans).length;
   app.innerHTML = `<div class="screen">
-   ${topbar(`<div class="mark">${drop}</div><div><h4>${esc(CONFIG.brandName)}</h4><small>Offer intake</small></div>`)}
+   ${topbar(`<div class="mark">${drop}</div><div><h4>${esc(CONFIG.brandName)}</h4><small>Offer intake</small></div><button class="circ ml" id="themeBtn" aria-label="Colour mode" title="Colour mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 000 18z" fill="currentColor"/></svg></button>`)}
    <h1 class="hero">NEW OIL<br>OFFER</h1>
    <p class="lede">Choose the product being offered. It takes about two minutes.</p>
    <div class="perks"><span>✓ Mostly tick boxes</span><span>✓ "Don't know" is fine</span><span>✓ Attach PDF &amp; photos</span></div>
@@ -395,6 +437,7 @@ function renderHome(app){
   app.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ if(S.cat!==b.dataset.c){S={cat:b.dataset.c,ans:{currency:'USD',per:'MT',...PROFILE.ans},files:[]}} view='form';step=0;save();render(); });
   const r=$('#resume'); if(r) r.onclick=()=>{view='form';step=0;render()};
   const mo=$('#myOffers'); if(mo) mo.onclick=()=>{view='history';render()};
+  $('#themeBtn').onclick=()=>{ const t=THEMES[(THEMES.indexOf(THEME)+1)%THEMES.length]; setTheme(t); toast({cream:'Cream mode',sky:'Sky mode',dark:'Dark mode'}[t],1400); };
 }
 
 function renderForm(app){
@@ -550,17 +593,24 @@ function renderReview(app){
      <dl class="kv">${s.rows.map(r=>`<dt>${esc(r.k)}</dt><dd class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</dd>`).join('')}</dl></div>`).join('')}
    <div class="send">
      <button class="sbtn" style="background:#6A4CF5;color:#fff" id="sEmail"><div>Send offer<small>To our desk by email, with PDF and files</small></div><span class="go">${arrow}</span></button>
-     <button class="sbtn" style="background:#CDD97A" id="sShare"><div>Share PDF<small>WhatsApp, email, Telegram, AirDrop…</small></div><span class="go">${arrow}</span></button>
+     <div class="dpick"><div class="dph"><b>Design of your offer file</b><button id="sPrev">👁 Preview</button></div>
+       <div class="dopts">${DESIGNS.map(([k,n,c])=>`<button class="dopt ${DESIGN===k?'on':''}" data-d="${k}"><i style="background:${c}"><em style="background:${k==='letter'?'#1B1B1B':cat().bg}"></em><u></u><u></u></i>${n}</button>`).join('')}</div></div>
+     <button class="sbtn" style="background:#CDD97A;color:#1B1B1B" id="sShare"><div>Share PDF<small>WhatsApp, email, Telegram, AirDrop…</small></div><span class="go">${arrow}</span></button>
+     <button class="sbtn" style="background:#FFC83D;color:#1B1B1B" id="sShareJ"><div>Share as picture (JPG)<small>Best for WhatsApp chats and status</small></div><span class="go">${arrow}</span></button>
      <div class="minis">
        <button class="mini" id="sDl"><b>⬇︎ PDF</b><small>Download</small></button>
+       <button class="mini" id="sJpg"><b>⬇︎ JPG</b><small>Download picture</small></button>
        <button class="mini" id="sDoc"><b>⬇︎ Word</b><small>Editable .doc</small></button>
        <button class="mini" id="sCopy"><b>⧉ Copy text</b><small>Paste anywhere</small></button>
-       <button class="mini" id="sWa"><b>WhatsApp</b><small>Text summary</small></button>
+       <button class="mini" id="sTxt"><b>💬 Plain text</b><small>To any WhatsApp chat</small></button>
+       <button class="mini" id="sWa"><b>WhatsApp us</b><small>Text to our desk</small></button>
      </div>
    </div></div>`;
   $('#bk').onclick=()=>{view='form';step=STAGES.length-1;render()};
   app.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{view='form';step=+b.dataset.edit;render()});
   $('#sEmail').onclick=sendEmail; $('#sShare').onclick=sharePdf; $('#sWa').onclick=sendWa; $('#sDl').onclick=downloadPdf; $('#sDoc').onclick=downloadDoc; $('#sCopy').onclick=copyText;
+  $('#sJpg').onclick=downloadJpg; $('#sShareJ').onclick=shareJpg; $('#sTxt').onclick=shareText; $('#sPrev').onclick=previewDesign;
+  app.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ DESIGN=b.dataset.d; try{localStorage.setItem('oilDesign',DESIGN)}catch(e){} app.querySelectorAll('[data-d]').forEach(x=>x.classList.toggle('on',x===b)); });
   $('#bar').hidden=true;
 }
 
@@ -594,16 +644,18 @@ function buildSheet(){
    </div>
    <div class="foot"><span>Submitted via petromad.space · ${sc}% complete</span><span>${ref}</span></div>`;
 }
-async function makePdf(){
+const makeJpg=()=>makePdf(true);
+async function makePdf(asImage){
   if(typeof html2canvas==='undefined'||!window.jspdf){toast('PDF tool is still loading — try again in a moment');throw new Error('no pdf lib')}
   buildSheet(); await document.fonts.ready;
-  const el=$('#sheet'), old=el.getAttribute('style')||'', y=window.scrollY;
+  const el=$('#sheet'), old=el.getAttribute('style')||'', y=window.scrollY; el.className='d-'+DESIGN;
   // render the sheet in the page (behind the app) so the capture is not blank
   el.setAttribute('style','position:absolute;left:0;top:0;z-index:-1;');
   await Promise.all([...el.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
   try{
     const W=794, H=el.scrollHeight, sc=Math.min(2, Math.sqrt(14e6/(W*H)));
-    const canvas=await html2canvas(el,{scale:sc,backgroundColor:'#EEEAE0',width:W,height:H,windowWidth:W,scrollX:0,scrollY:0,useCORS:true,logging:false});
+    const canvas=await html2canvas(el,{scale:sc,backgroundColor:(DESIGNS.find(d=>d[0]===DESIGN)||DESIGNS[0])[2],width:W,height:H,windowWidth:W,scrollX:0,scrollY:0,useCORS:true,logging:false});
+    if(asImage) return await new Promise(r=>canvas.toBlob(r,'image/jpeg',.92));
     const {jsPDF}=window.jspdf; const pdf=new jsPDF({unit:'px',format:[W,H],orientation:H>W?'p':'l',hotfixes:['px_scaling']});
     pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',0,0,W,H);
     return pdf.output('blob');
@@ -611,6 +663,23 @@ async function makePdf(){
 }
 function saveBlob(b,name){ const u=URL.createObjectURL(b); const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000); }
 async function downloadPdf(){ toast('Making the PDF…'); const b=await makePdf(); saveBlob(b,ref+'.pdf'); remember(); }
+async function downloadJpg(){ toast('Making the image…'); const b=await makeJpg(); saveBlob(b,ref+'.jpg'); remember(); }
+async function shareFile(b,name,type){
+  const file=new File([b],name,{type}); remember();
+  if(navigator.canShare&&navigator.canShare({files:[file]})){ try{await navigator.share({files:[file],title:ref})}catch(e){} }
+  else { toast('Sharing is not supported here, downloading instead'); saveBlob(b,name); }
+}
+async function shareJpg(){ toast('Making the image…'); shareFile(await makeJpg(), ref+'.jpg','image/jpeg'); }
+async function shareText(){
+  const t=summaryText();
+  if(navigator.share){ try{ await navigator.share({text:t}); remember(); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
+  location.href='https://wa.me/?text='+encodeURIComponent(t); remember();
+}
+async function previewDesign(){
+  toast('Making the preview…'); const b=await makeJpg(); const u=URL.createObjectURL(b);
+  const o=document.createElement('div'); o.className='pv'; o.innerHTML=`<div class="pvbar"><b>${esc((DESIGNS.find(d=>d[0]===DESIGN)||[])[1]||'')} design</b><button>Close ✕</button></div><img src="${u}" alt="Preview">`;
+  o.querySelector('button').onclick=()=>{o.remove();URL.revokeObjectURL(u)}; document.body.appendChild(o);
+}
 function downloadDoc(){
   const A=S.ans, v=id=>{const x=fmt({id,type:''},A);return x&&x!==DK?x:''}, co=v('company'), nm=v('cname');
   const row=r=>`<tr><td style="color:#6E6A61;padding:3px 12px 3px 0;width:38%">${esc(r.k)}</td><td style="padding:3px 0"><b>${esc(r.v||'—')}</b></td></tr>`;
@@ -652,9 +721,7 @@ function renderHistory(app){
   app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ if(!confirm('Delete this saved offer?')) return; const all=HIST(); all.splice(+b.dataset.del,1); localStorage.setItem('oilHistory',JSON.stringify(all)); render(); });
 }
 async function sharePdf(){
-  toast('Making the PDF…'); const b=await makePdf(); remember(); const file=new File([b],ref+'.pdf',{type:'application/pdf'});
-  if(navigator.canShare&&navigator.canShare({files:[file]})){ try{await navigator.share({files:[file],title:ref,text:summaryText()})}catch(e){} }
-  else { toast('Sharing files is not supported here — downloading instead'); downloadPdf(); }
+  toast('Making the PDF…'); shareFile(await makePdf(), ref+'.pdf','application/pdf');
 }
 function summaryText(){
   const A=S.ans; let t=`*NEW OIL OFFER* ${ref}\n*${productTitle()}* (${cat().name})\n`;
