@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* Settings (email + WhatsApp) are in the CONFIG block at the top of the script */
 :root{
@@ -99,6 +100,13 @@ textarea.f{min-height:90px;resize:vertical}
 .lbtn{font:700 13px 'Urbanist',sans-serif;background:#fff;border:0;border-radius:99px;padding:9px 14px;cursor:pointer;color:#1B1B1B}
 .logoup{font-size:22px}.logoup b{display:block;font-size:15px;margin-top:4px}
 .forget{display:block;margin-top:10px;font:600 12px 'Urbanist',sans-serif;color:#6E6A61;text-decoration:underline;background:none;border:0;padding:0;cursor:pointer}
+.minis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini{background:#fff;border:0;border-radius:20px;padding:14px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
+.mini b{display:block;font-size:16px}.mini small{display:block;font-size:12px;opacity:.7;margin-top:2px}
+.hist{background:#fff;border-radius:20px;padding:14px 14px 14px 16px;margin-bottom:10px;display:flex;gap:10px;align-items:center}
+.hist small{display:block;font-size:12px;color:#6E6A61}.hist b{display:block;font-size:19px;margin:2px 0}.hist span{display:block;font-size:13px;font-weight:600}
+.hist .hb{margin-left:auto;display:flex;flex-direction:column;gap:6px}
+.hist .hb button{border:0;border-radius:99px;background:#F2EEE5;padding:7px 12px;font:700 12px 'Urbanist',sans-serif;cursor:pointer;color:var(--ink)}
 .fbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fbtns .files{padding:16px 8px;font-size:22px}
 .fbtns .files b{display:block;font-size:15px;margin-top:4px}
@@ -366,6 +374,7 @@ function render(){
   if(view==='form') return renderForm(app);
   if(view==='review') return renderReview(app);
   if(view==='done') return renderDone(app);
+  if(view==='history') return renderHistory(app);
 }
 function topbar(left){
   return `<div class="top">${left}</div>`;
@@ -379,11 +388,13 @@ function renderHome(app){
    <p class="lede">Choose the product being offered. It takes about two minutes.</p>
    <div class="perks"><span>✓ Mostly tick boxes</span><span>✓ "Don't know" is fine</span><span>✓ Attach PDF &amp; photos</span></div>
    ${draft?`<button class="sbtn" style="background:#fff;margin-bottom:14px" id="resume"><div>Continue draft<small>${esc(cat().name)} offer in progress</small></div><span class="go">${arrow}</span></button>`:''}
+   ${HIST().length?`<button class="sbtn" style="background:#1B1B1B;color:#fff;margin-bottom:14px" id="myOffers"><div>My offers<small>${HIST().length} saved · open again or reuse</small></div><span class="go">${arrow}</span></button>`:''}
    <div class="stack">${CATS.map(c=>`<button class="cat ${c.dark?'dark':''} ${c.bg==='#FFFFFF'?'light':''}" data-c="${c.id}" style="background:${c.bg};color:${c.fg}">
      <span class="ic">${c.icon}</span><span><b>${c.name}</b><span class="sub">${c.sub}</span></span><span class="go">${arrow}</span></button>`).join('')}</div>
   </div>`;
   app.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ if(S.cat!==b.dataset.c){S={cat:b.dataset.c,ans:{currency:'USD',per:'MT',...PROFILE.ans},files:[]}} view='form';step=0;save();render(); });
   const r=$('#resume'); if(r) r.onclick=()=>{view='form';step=0;render()};
+  const mo=$('#myOffers'); if(mo) mo.onclick=()=>{view='history';render()};
 }
 
 function renderForm(app){
@@ -536,13 +547,17 @@ function renderReview(app){
      <dl class="kv">${s.rows.map(r=>`<dt>${esc(r.k)}</dt><dd class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</dd>`).join('')}</dl></div>`).join('')}
    <div class="send">
      <button class="sbtn" style="background:#6A4CF5;color:#fff" id="sEmail"><div>Send offer<small>To our desk by email, with PDF and files</small></div><span class="go">${arrow}</span></button>
-     <button class="sbtn" style="background:#CDD97A" id="sShare"><div>Share PDF to WhatsApp<small>Opens your share menu</small></div><span class="go">${arrow}</span></button>
-     <button class="sbtn" style="background:#FFC83D" id="sWa"><div>Send summary on WhatsApp<small>Text message to our desk</small></div><span class="go">${arrow}</span></button>
-     <button class="sbtn" style="background:#fff" id="sDl"><div>Download PDF<small>Save the offer sheet</small></div><span class="go">${arrow}</span></button>
+     <button class="sbtn" style="background:#CDD97A" id="sShare"><div>Share PDF<small>WhatsApp, email, Telegram, AirDrop…</small></div><span class="go">${arrow}</span></button>
+     <div class="minis">
+       <button class="mini" id="sDl"><b>⬇︎ PDF</b><small>Download</small></button>
+       <button class="mini" id="sDoc"><b>⬇︎ Word</b><small>Editable .doc</small></button>
+       <button class="mini" id="sCopy"><b>⧉ Copy text</b><small>Paste anywhere</small></button>
+       <button class="mini" id="sWa"><b>WhatsApp</b><small>Text summary</small></button>
+     </div>
    </div></div>`;
   $('#bk').onclick=()=>{view='form';step=STAGES.length-1;render()};
   app.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{view='form';step=+b.dataset.edit;render()});
-  $('#sEmail').onclick=sendEmail; $('#sShare').onclick=sharePdf; $('#sWa').onclick=sendWa; $('#sDl').onclick=downloadPdf;
+  $('#sEmail').onclick=sendEmail; $('#sShare').onclick=sharePdf; $('#sWa').onclick=sendWa; $('#sDl').onclick=downloadPdf; $('#sDoc').onclick=downloadDoc; $('#sCopy').onclick=copyText;
   $('#bar').hidden=true;
 }
 
@@ -577,17 +592,64 @@ function buildSheet(){
    <div class="foot"><span>Submitted via petromad.space · ${sc}% complete</span><span>${ref}</span></div>`;
 }
 async function makePdf(){
-  if(typeof html2pdf==='undefined'){toast('PDF tool is still loading — try again in a moment');throw new Error('no html2pdf')}
+  if(typeof html2canvas==='undefined'||!window.jspdf){toast('PDF tool is still loading — try again in a moment');throw new Error('no pdf lib')}
   buildSheet(); await document.fonts.ready;
-  const el=$('#sheet');
-  return await html2pdf().set({margin:0,filename:ref+'.pdf',image:{type:'jpeg',quality:.95},html2canvas:{scale:2,backgroundColor:'#EEEAE0',windowWidth:794},jsPDF:{unit:'px',format:[794,Math.max(1123,el.scrollHeight)],hotfixes:['px_scaling']}}).from(el).outputPdf('blob');
+  const el=$('#sheet'), old=el.getAttribute('style')||'', y=window.scrollY;
+  // render the sheet in the page (behind the app) so the capture is not blank
+  el.setAttribute('style','position:absolute;left:0;top:0;z-index:-1;');
+  await Promise.all([...el.querySelectorAll('img')].map(i=>i.complete?0:new Promise(r=>{i.onload=i.onerror=r})));
+  try{
+    const W=794, H=el.scrollHeight, sc=Math.min(2, Math.sqrt(14e6/(W*H)));
+    const canvas=await html2canvas(el,{scale:sc,backgroundColor:'#EEEAE0',width:W,height:H,windowWidth:W,scrollX:0,scrollY:0,useCORS:true,logging:false});
+    const {jsPDF}=window.jspdf; const pdf=new jsPDF({unit:'px',format:[W,H],orientation:H>W?'p':'l',hotfixes:['px_scaling']});
+    pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',0,0,W,H);
+    return pdf.output('blob');
+  } finally { el.setAttribute('style',old); window.scrollTo(0,y); }
 }
-async function downloadPdf(){
-  toast('Making the PDF…'); const b=await makePdf(); const u=URL.createObjectURL(b);
-  const a=document.createElement('a');a.href=u;a.download=ref+'.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
+function saveBlob(b,name){ const u=URL.createObjectURL(b); const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000); }
+async function downloadPdf(){ toast('Making the PDF…'); const b=await makePdf(); saveBlob(b,ref+'.pdf'); remember(); }
+function downloadDoc(){
+  const A=S.ans, v=id=>{const x=fmt({id,type:''},A);return x&&x!==DK?x:''}, co=v('company'), nm=v('cname');
+  const row=r=>`<tr><td style="color:#6E6A61;padding:3px 12px 3px 0;width:38%">${esc(r.k)}</td><td style="padding:3px 0"><b>${esc(r.v||'—')}</b></td></tr>`;
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${ref}</title></head>
+<body style="font-family:Arial,sans-serif;font-size:11pt;color:#1B1B1B">
+<table width="100%"><tr><td><span style="font-size:18pt;font-weight:bold">${esc(co||nm||CONFIG.brandName)}</span><br><span style="color:#6E6A61;font-size:9pt">${esc([v('address'),v('phone'),v('email'),v('website')].filter(Boolean).join(' · '))}</span></td>
+<td align="right" style="font-size:9pt"><b style="letter-spacing:1px">OFFICIAL OFFER</b><br>${ref}<br>${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td></tr></table><hr>
+<p style="margin:14pt 0 2pt;color:#6E6A61">${esc(cat().name)}</p><p style="font-size:24pt;font-weight:bold;margin:0 0 10pt">${esc(productTitle())}</p>
+${sections().map(s=>{const rows=s.rows.filter(r=>r.k!=='Documents the seller has'||r.v); return `<p style="font-size:13pt;font-weight:bold;margin:14pt 0 4pt">${esc(s.title)}</p><table width="100%" style="font-size:10.5pt">${rows.map(row).join('')}</table>`}).join('')}
+<br><hr><p style="color:#6E6A61;font-size:9pt;margin:8pt 0 0">Issued for and on behalf of</p><p style="font-size:14pt;font-weight:bold;margin:0">${esc(co||nm||'—')}</p>
+<p style="margin:0">${esc([nm,v('role')].filter(Boolean).join(', '))}</p><br><br><p>______________________________<br><span style="color:#6E6A61;font-size:9pt">Signature &amp; stamp</span></p>
+</body></html>`;
+  saveBlob(new Blob(['\ufeff',html],{type:'application/msword'}), ref+'.doc'); toast('Word file downloaded'); remember();
+}
+async function copyText(){
+  const t=summaryText().replace(/\*/g,'');
+  try{ await navigator.clipboard.writeText(t); }catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  toast('Offer copied, paste it anywhere'); remember();
+}
+/* ---------------- my offers (saved on this phone) ---------------- */
+const HIST=()=>{ try{return JSON.parse(localStorage.getItem('oilHistory')||'[]')}catch(e){return []} };
+function remember(){
+  if(!S.cat||!ref) return; const h=HIST().filter(x=>x.ref!==ref);
+  h.unshift({ref,cat:S.cat,ans:S.ans,title:productTitle(),price:fmt({id:'prices',type:'prices'},S.ans),date:new Date().toISOString()});
+  try{ localStorage.setItem('oilHistory',JSON.stringify(h.slice(0,50))) }catch(e){}
+}
+function renderHistory(app){
+  $('#bar').hidden=true; const h=HIST();
+  app.innerHTML=`<div class="screen">
+   ${topbar(`<button class="circ" id="bk" aria-label="Back">${back}</button><div style="margin:0 auto;text-align:center"><h4>My offers</h4><small>${h.length} saved on this phone</small></div><span style="width:52px"></span>`)}
+   ${h.length?h.map((x,i)=>{const c=CATS.find(c=>c.id===x.cat)||CATS[0];return `<div class="hist" style="border-left:8px solid ${c.bg==='#FFFFFF'?'#D9D3C5':c.bg}">
+     <div><small>${esc(c.name)} · ${new Date(x.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · ${esc(x.ref)}</small><b>${esc(x.title)}</b>${x.price&&x.price!==DK?`<span>${esc(x.price)}</span>`:''}</div>
+     <div class="hb"><button data-open="${i}">Open</button><button data-copy="${i}">Reuse</button><button data-del="${i}" aria-label="Delete">✕</button></div></div>`}).join('')
+   :`<p class="lede">Offers you send, download or share will appear here, so you can open them again or reuse them for a new offer.</p>`}
+  </div>`;
+  $('#bk').onclick=()=>{view='home';render()};
+  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const x=h[+b.dataset.open]; S={cat:x.cat,ans:JSON.parse(JSON.stringify(x.ans)),files:[]}; ref=x.ref; view='review'; render();});
+  app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{const x=h[+b.dataset.copy]; S={cat:x.cat,ans:{...JSON.parse(JSON.stringify(x.ans)),...PROFILE.ans},files:[]}; ref=''; view='form'; step=0; save(); render(); toast('Copied, update anything that changed');});
+  app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ if(!confirm('Delete this saved offer?')) return; const all=HIST(); all.splice(+b.dataset.del,1); localStorage.setItem('oilHistory',JSON.stringify(all)); render(); });
 }
 async function sharePdf(){
-  toast('Making the PDF…'); const b=await makePdf(); const file=new File([b],ref+'.pdf',{type:'application/pdf'});
+  toast('Making the PDF…'); const b=await makePdf(); remember(); const file=new File([b],ref+'.pdf',{type:'application/pdf'});
   if(navigator.canShare&&navigator.canShare({files:[file]})){ try{await navigator.share({files:[file],title:ref,text:summaryText()})}catch(e){} }
   else { toast('Sharing files is not supported here — downloading instead'); downloadPdf(); }
 }
@@ -636,7 +698,7 @@ async function sendEmail(){
   await notifyPhone(o);
   sendFormSubmit(pdf);
 }
-function finishSent(){ try{localStorage.removeItem('oilOfferDraft')}catch(e){} view='done'; render(); }
+function finishSent(){ remember(); try{localStorage.removeItem('oilOfferDraft')}catch(e){} view='done'; render(); }
 function sendFormSubmit(pdf){
   const f=document.createElement('form'); f.method='POST'; f.enctype='multipart/form-data'; f.target='fsframe';
   f.action='https://formsubmit.co/'+encodeURIComponent(CONFIG.receiverEmail); f.style.display='none';
@@ -660,9 +722,10 @@ function renderDone(app){
   app.innerHTML=`<div class="screen done">
    <div class="big">✓</div><h1 class="hero" style="font-size:40px">OFFER SENT</h1>
    <p class="lede" style="margin:8px auto 24px">Reference ${ref}. We’ll reply on WhatsApp or email after checking the details.</p>
-   <div class="send"><button class="sbtn" style="background:#FFC83D" id="sWa"><div>Also send on WhatsApp<small>Summary to our desk</small></div><span class="go">${arrow}</span></button>
+   <div class="send"><button class="sbtn" style="background:#CDD97A" id="sShare"><div>Share your PDF<small>Keep a copy or send it to others</small></div><span class="go">${arrow}</span></button>
+   <button class="sbtn" style="background:#FFC83D" id="sWa"><div>Also send on WhatsApp<small>Summary to our desk</small></div><span class="go">${arrow}</span></button>
    <button class="sbtn" style="background:#1B1B1B;color:#fff" id="again"><div>Send another offer</div><span class="go">${arrow}</span></button></div></div>`;
-  $('#sWa').onclick=sendWa; $('#again').onclick=()=>{S={cat:null,ans:{},files:[]};ref='';view='home';render()};
+  $('#sWa').onclick=sendWa; $('#sShare').onclick=sharePdf; $('#again').onclick=()=>{S={cat:null,ans:{},files:[]};ref='';view='home';render()};
 }
 
 load(); loadLearned(); render();
