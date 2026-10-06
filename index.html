@@ -279,6 +279,8 @@ const STAGES = [
    {id:'basis',label:'Price basis',type:'chips',options:['Fixed price','Platts minus discount','Platts plus premium','Negotiable']},
    {id:'platts',label:'Which Platts benchmark?',type:'chips',showIf:s=>/Platts/.test(s.basis||''),options:['Platts Arab Gulf (MOPAG)','Platts Singapore (MOPS) – Asia / Malaysia','Platts Rotterdam (NWE / ARA)','Platts Mediterranean','Platts US Gulf Coast','Platts Dubai / Oman (crude)','Dated Brent (crude)']},
    {id:'discount',label:'Discount / premium',hint:'e.g. −$8 or −12%',type:'text',showIf:s=>/Platts/.test(s.basis||'')},
+   {id:'commission',label:'Broker commission?',hint:'e.g. Platts +20 +10',type:'chips',options:['Yes – on top of the price','Yes – already included in the price','No commission']},
+   {id:'commamt',label:'Commission amount',hint:'e.g. $10 per MT, or $5 buyer side + $5 seller side',type:'text',showIf:s=>/^Yes/.test(s.commission||'')||s.commission==='__other'},
    {id:'payment',label:'Payment terms',type:'multi',options:['MT103 / TT','DLC','SBLC','Pay after Q&Q','Escrow']},
    {id:'procedure',label:'Procedure',type:'multi',options:['Dip test','SGS Q&Q','Tank storage agreement','Injection','Vessel inspection']},
    {id:'validity',label:'Offer valid until',type:'date'}
