@@ -277,6 +277,7 @@ const STAGES = [
    {id:'currency',label:'Currency',type:'chips',options:['USD','EUR','AED'],noDK:true},
    {id:'per',label:'Price per',type:'chips',options:['MT','BBL','Litre','Gallon','CBM'],noDK:true},
    {id:'basis',label:'Price basis',type:'chips',options:['Fixed price','Platts minus discount','Platts plus premium','Negotiable']},
+   {id:'platts',label:'Which Platts benchmark?',type:'chips',showIf:s=>/Platts/.test(s.basis||''),options:['Platts Arab Gulf (MOPAG)','Platts Singapore (MOPS) – Asia / Malaysia','Platts Rotterdam (NWE / ARA)','Platts Mediterranean','Platts US Gulf Coast','Platts Dubai / Oman (crude)','Dated Brent (crude)']},
    {id:'discount',label:'Discount / premium',hint:'e.g. −$8 or −12%',type:'text',showIf:s=>/Platts/.test(s.basis||'')},
    {id:'payment',label:'Payment terms',type:'multi',options:['MT103 / TT','DLC','SBLC','Pay after Q&Q','Escrow']},
    {id:'procedure',label:'Procedure',type:'multi',options:['Dip test','SGS Q&Q','Tank storage agreement','Injection','Vessel inspection']},
