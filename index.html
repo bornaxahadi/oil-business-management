@@ -73,6 +73,7 @@ button{cursor:pointer;border:0;background:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:10px 15px;border-radius:99px;background:var(--soft);border:1.5px solid var(--soft);font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:7px}
 .chip.on{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.chip.cust{border-style:dashed}
 .chip.unk{border:1.5px dashed var(--muted);background:transparent;color:var(--muted)}
 .chip.unk.on{background:var(--ink);color:#fff;border-style:solid;border-color:var(--ink)}
 .chip .sw{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.2)}
@@ -376,9 +377,9 @@ function drawQs(){
       const sel = f.type==='multi' ? (Array.isArray(v)?v:[]) : v;
       const on = o=> f.type==='multi' ? sel.includes(o) : sel===o;
       body = `<div class="chips">${f.options.map(o=>`<button class="chip ${on(o)?'on':''}" data-f="${f.id}" data-o="${esc(o)}">${f.swatch?`<span class="sw" style="background:${SWATCH[o]||'#ccc'}"></span>`:''}${esc(o)}</button>`).join('')}
-        ${f.other?`<button class="chip ${v==='__other'||(A[f.id+'_other']&&v==='__other')?'on':''}" data-f="${f.id}" data-o="__other">Other</button>`:''}
+        ${hasOther(f)?`<button class="chip cust ${on('__other')?'on':''}" data-f="${f.id}" data-o="__other">✎ Custom</button>`:''}
         ${f.noDK?'':`<button class="chip unk ${unk||(f.type==='multi'&&sel.includes(DK))?'on':''}" data-f="${f.id}" data-o="${DK}">Don't know</button>`}</div>
-        ${f.other&&v==='__other'?`<input class="f mt8" data-t="${f.id}_other" placeholder="Type it here" value="${esc(A[f.id+'_other'])}">`:''}`;
+        ${hasOther(f)&&on('__other')?`<input class="f mt8" data-t="${f.id}_other" placeholder="Not in the list? Type your own answer" value="${esc(A[f.id+'_other'])}">`:''}`;
     } else if(f.type==='text'){
       body=`<input class="f" data-t="${f.id}" inputmode="${f.input==='decimal'?'decimal':f.input==='numeric'?'numeric':f.input==='tel'?'tel':'text'}" type="${f.input==='email'?'email':f.input==='tel'?'tel':'text'}" value="${unk?'':esc(v)}" ${unk?'disabled':''} placeholder="${unk?DK:''}">`;
     } else if(f.type==='textarea'){
@@ -423,9 +424,18 @@ function fmt(f,A){
   let v=A[f.id];
   if(f.type==='prices'){ const p=A.prices||{}; const out=(A.terms||[]).filter(t=>t!==DK&&p[t]).map(t=>`${t} ${A.currency||'USD'} ${p[t]}/${A.per||'MT'}`); return out.join(' · ')||''; }
   if(v==='__other') return A[f.id+'_other']||'';
-  if(Array.isArray(v)) return v.join(', ');
+  if(Array.isArray(v)) return v.map(x=>x==='__other'?(A[f.id+'_other']||''):x).filter(Boolean).join(', ');
   if(v&&typeof v==='object') return v.n?`${v.n} ${v.u||''}`.trim():'';
   return v||'';
+}
+const hasOther = f => (f.type==='chips'||f.type==='multi') && f.other!==false && !f.noDK;
+function customEntries(){
+  const A=S.ans, out=[];
+  STAGES.forEach((st,i)=>fieldsFor(i).filter(f=>visible(f)&&hasOther(f)).forEach(f=>{
+    const v=A[f.id], picked = Array.isArray(v)?v.includes('__other'):v==='__other', t=(A[f.id+'_other']||'').trim();
+    if(picked&&t) out.push({q:(i===0?cat().name+' — ':'')+f.label, v:t});
+  }));
+  return out;
 }
 function sections(){
   const A=S.ans, out=[];
@@ -517,6 +527,7 @@ function offerFields(){
     price: fmt({id:'prices',type:'prices'},A), contactName: val('cname'), company: val('company'),
     phone: val('phone'), email: val('email'), completeness: completeness()+'%',
     sections: sections().map(s=>({title:s.title,color:s.bg,rows:s.rows.map(r=>({k:r.k,v:r.v||''}))})),
+    customs: customEntries(),
     text: summaryText().replace(/\*/g,'') };
 }
 const toB64 = blob => new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob)});
@@ -554,6 +565,7 @@ function sendFormSubmit(pdf){
   add('Reference',ref); add('Product',`${productTitle()} (${cat().name})`);
   sections().forEach(s=>s.rows.forEach(r=>add(`${s.title} — ${r.k}`, r.v||'—')));
   add('Completeness',completeness()+'%');
+  const cu=customEntries(); if(cu.length){ add('★ NEW OPTIONS to add to the app', cu.map(c=>`${c.q}: ${c.v}`).join(' | ')); f.querySelector('[name=_subject]').value+=' ★ new options'; }
   const allFiles=[new File([pdf],ref+'.pdf',{type:'application/pdf'}),...S.files];
   allFiles.forEach((file,i)=>{const inp=document.createElement('input');inp.type='file';inp.name='attachment'+(i+1);const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;f.appendChild(inp)});
   document.body.appendChild(f);

@@ -49,8 +49,9 @@ function doPost(e) {
     const to = SETTINGS.toEmail || Session.getEffectiveUser().getEmail();
     const opts = {htmlBody: html_(d, ref, sub.getUrl(), attach.length < blobs.length), attachments: attach, name: 'Oil Offer Desk'};
     if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email || '')) opts.replyTo = d.email;
-    GmailApp.sendEmail(to, 'New oil offer ' + ref + ' — ' + (d.product || ''), d.text || '', opts);
+    GmailApp.sendEmail(to, 'New oil offer ' + ref + ' — ' + (d.product || '') + (d.customs && d.customs.length ? ' ★ new options' : ''), d.text || '', opts);
 
+    if (d.customs && d.customs.length) newOptions_().appendRow([new Date(), ref, d.product, d.customs.map(c => c.q + ': ' + c.v).join(' | ')]);
     notify_(d, ref, sub.getUrl());
     return out_({ok: true, ref: ref});
   } catch (err) {
@@ -80,6 +81,14 @@ function sheet_() {
   DriveApp.getFileById(ss.getId()).moveTo(folder_());
   p.setProperty('SHEET', ss.getId());
   return sh;
+}
+
+/** Second tab in the Sheet: answers sellers typed under "Custom" — candidates to add to the app's lists. */
+function newOptions_() {
+  const ss = sheet_().getParent();
+  return ss.getSheetByName('New options') || (() => {
+    const s = ss.insertSheet('New options'); s.appendRow(['Received', 'Ref', 'Product', 'Custom answers']);
+    s.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#F2C94C'); s.setFrozenRows(1); return s; })();
 }
 
 function notify_(d, ref, link) {
@@ -113,6 +122,7 @@ function html_(d, ref, link, trimmed) {
       <div style="font-size:14px">${esc_([d.origin, d.quantity, d.price].filter(String).join(' · '))}</div>
       <div style="margin-top:12px;font-size:13px">Completeness: <b>${esc_(d.completeness)}</b></div>
     </td></tr>
+    ${(d.customs && d.customs.length) ? `<tr><td style="padding-top:14px"><div style="background:#F2C94C;border-radius:16px;padding:12px 14px;font:13px Arial"><b>★ New options typed by the seller</b> — add to the app?<br>${d.customs.map(c => esc_(c.q) + ': <b>' + esc_(c.v) + '</b>').join('<br>')}</div></td></tr>` : ''}
     ${sec}
     <tr><td style="padding:16px 0">
       <a href="${link}" style="display:inline-block;background:#1B1B1B;color:#fff;text-decoration:none;padding:12px 20px;border-radius:99px;font-weight:bold">Open files in Drive</a>
