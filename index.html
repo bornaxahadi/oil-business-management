@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Oil Offers">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#EEEAE0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Oil Offer Intake</title>
@@ -21,7 +25,9 @@
 html[data-theme=sky]{--bg:#E3EBF1;--soft:#F1F5F8;--line:#C7D3DC;--muted:#5C6973}
 html[data-theme=dark]{--bg:#121212;--ink:#F1EEE7;--soft:#272727;--line:#3A3A3A;--muted:#A8A294;--white:#1E1E1E;color-scheme:dark}
 html[data-theme=dark] .cat.dark{background:#2C2C2C!important}
-html[data-theme=dark] #resume{background:var(--white)!important}
+html[data-theme=dark] #resume,html[data-theme=dark] #myProfile{background:var(--white)!important;color:var(--ink)!important}
+html[data-theme=dark] .chip.cust.on{color:#fff;background:#22A04B;border-color:#22A04B}
+html[data-theme=dark] .done .big{color:#1B1B1B}
 html[data-theme=dark] .chip.cust{color:#5BD07F;border-color:#3FB765}
 html[data-theme=dark] .sbtn:not([style*="color"]){color:#1B1B1B}
 html[data-theme=dark] .stagecard{box-shadow:inset 0 0 0 1px #ffffff14}
@@ -118,6 +124,9 @@ textarea.f{min-height:90px;resize:vertical}
 .pv{position:fixed;inset:0;z-index:50;background:#000d;overflow:auto;padding:calc(10px + env(safe-area-inset-top,0px)) 10px 30px}
 .pvbar{display:flex;align-items:center;color:#fff;margin-bottom:10px}.pvbar button{margin-left:auto;background:#fff;color:#1B1B1B;border-radius:99px;padding:8px 14px;font-weight:700}
 .pv img{width:100%;border-radius:10px;display:block}
+.sbtn.prof img,.sbtn.prof .av{width:46px;height:46px;border-radius:50%;object-fit:contain;background:#fff;flex:none;box-shadow:0 0 0 1px #0001}
+.sbtn.prof .av{display:grid;place-items:center;background:var(--purple);color:#fff;font-weight:800;font-size:20px}
+.tip{font-size:13px;color:var(--muted);background:var(--white);border-radius:var(--r-md);padding:14px;margin-top:14px;line-height:1.5}
 .minis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mini{background:var(--white);border:0;border-radius:20px;padding:14px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer}
 .mini b{display:block;font-size:16px}.mini small{display:block;font-size:12px;opacity:.7;margin-top:2px}
@@ -162,7 +171,7 @@ textarea.f{min-height:90px;resize:vertical}
 .sbtn .go svg{width:18px;height:18px;stroke:#1B1B1B}
 .toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:99px;font-weight:600;font-size:15px;z-index:50;max-width:90vw;text-align:center}
 .done{text-align:center;padding-top:40px}
-.done .big{width:96px;height:96px;border-radius:50%;background:var(--lime);display:grid;place-items:center;margin:0 auto 18px;font-size:44px}
+.done .big{color:#1B1B1B;width:96px;height:96px;border-radius:50%;background:var(--lime);display:grid;place-items:center;margin:0 auto 18px;font-size:44px}
 @media (prefers-reduced-motion:no-preference){.screen{animation:in .28s ease-out}@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
 
 /* ================= PDF SHEET (off-screen) ================= */
@@ -397,7 +406,7 @@ async function loadLearned(){
 const esc = v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PKEYS=['cname','company','role','phone','email','address','website'];
 let PROFILE={ans:{},logo:''}; try{ PROFILE=Object.assign(PROFILE,JSON.parse(localStorage.getItem('oilProfile')||'{}')) }catch(e){}
-const saveProfile=()=>{ PKEYS.forEach(k=>{ const v=S.ans[k]; if(v&&v!==DK) PROFILE.ans[k]=v; }); try{localStorage.setItem('oilProfile',JSON.stringify(PROFILE))}catch(e){ toast('Logo too large to save, try a smaller image') } };
+const saveProfile=()=>{ PKEYS.forEach(k=>{ if(!(k in S.ans)) return; const v=S.ans[k]; if(v&&v!==DK) PROFILE.ans[k]=v; else if(v==='') delete PROFILE.ans[k]; }); try{localStorage.setItem('oilProfile',JSON.stringify(PROFILE))}catch(e){ toast('Logo too large to save, try a smaller image') } };
 const save=()=>{try{localStorage.setItem('oilOfferDraft',JSON.stringify({cat:S.cat,ans:S.ans}))}catch(e){} saveProfile();};
 const load=()=>{try{const d=JSON.parse(localStorage.getItem('oilOfferDraft')||'null');if(d&&d.cat){S.cat=d.cat;S.ans=d.ans||{}}}catch(e){}};
 const cat = ()=>CATS.find(c=>c.id===S.cat);
@@ -417,6 +426,7 @@ function render(){
   if(view==='review') return renderReview(app);
   if(view==='done') return renderDone(app);
   if(view==='history') return renderHistory(app);
+  if(view==='profile') return renderProfile(app);
 }
 function topbar(left){
   return `<div class="top">${left}</div>`;
@@ -430,6 +440,8 @@ function renderHome(app){
    <p class="lede">Choose the product being offered. It takes about two minutes.</p>
    <div class="perks"><span>✓ Mostly tick boxes</span><span>✓ "Don't know" is fine</span><span>✓ Attach PDF &amp; photos</span></div>
    ${draft?`<button class="sbtn" style="background:#fff;margin-bottom:14px" id="resume"><div>Continue draft<small>${esc(cat().name)} offer in progress</small></div><span class="go">${arrow}</span></button>`:''}
+   ${PROFILE.ans.cname||PROFILE.ans.company?`<button class="sbtn prof" style="background:#fff;margin-bottom:14px" id="myProfile">${PROFILE.logo?`<img src="${PROFILE.logo}" alt="">`:`<span class="av">${esc((PROFILE.ans.company||PROFILE.ans.cname||'?').trim()[0].toUpperCase())}</span>`}<div>${esc(PROFILE.ans.company||PROFILE.ans.cname)}<small>My profile · ${esc([PROFILE.ans.cname,PROFILE.ans.phone].filter(Boolean).join(' · ')||'tap to edit')}</small></div><span class="go">${arrow}</span></button>`
+     :`<button class="sbtn" style="background:#6A4CF5;color:#fff;margin-bottom:14px" id="myProfile"><div>Create your profile<small>Save your name, company &amp; logo once</small></div><span class="go">${arrow}</span></button>`}
    ${HIST().length?`<button class="sbtn" style="background:#1B1B1B;color:#fff;margin-bottom:14px" id="myOffers"><div>My offers<small>${HIST().length} saved · open again or reuse</small></div><span class="go">${arrow}</span></button>`:''}
    <div class="stack">${CATS.map(c=>`<button class="cat ${c.dark?'dark':''} ${c.bg==='#FFFFFF'?'light':''}" data-c="${c.id}" style="background:${c.bg};color:${c.fg}">
      <span class="ic">${c.icon}</span><span><b>${c.name}</b><span class="sub">${c.sub}</span></span><span class="go">${arrow}</span></button>`).join('')}</div>
@@ -437,10 +449,13 @@ function renderHome(app){
   app.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ if(S.cat!==b.dataset.c){S={cat:b.dataset.c,ans:{currency:'USD',per:'MT',...PROFILE.ans},files:[]}} view='form';step=0;save();render(); });
   const r=$('#resume'); if(r) r.onclick=()=>{view='form';step=0;render()};
   const mo=$('#myOffers'); if(mo) mo.onclick=()=>{view='history';render()};
+  $('#myProfile').onclick=()=>{view='profile';render()};
   $('#themeBtn').onclick=()=>{ const t=THEMES[(THEMES.indexOf(THEME)+1)%THEMES.length]; setTheme(t); toast({cream:'Cream mode',sky:'Sky mode',dark:'Dark mode'}[t],1400); };
 }
 
+const fillProfile=()=>{ PKEYS.forEach(k=>{ if(!(k in S.ans) && PROFILE.ans[k]) S.ans[k]=PROFILE.ans[k]; }); };
 function renderForm(app){
+  fillProfile();
   const st=STAGES[step], c=cat();
   const color = step===0 ? {bg:c.bg,fg:c.fg,dark:c.dark} : st;
   app.innerHTML = `<div class="screen">
@@ -706,6 +721,32 @@ function remember(){
   h.unshift({ref,cat:S.cat,ans:S.ans,title:productTitle(),price:fmt({id:'prices',type:'prices'},S.ans),date:new Date().toISOString()});
   try{ localStorage.setItem('oilHistory',JSON.stringify(h.slice(0,50))) }catch(e){}
 }
+function renderProfile(app){
+  $('#bar').hidden=true; const P=PROFILE.ans;
+  const fld=(k,l,t='text')=>`<div class="q"><div class="qh"><label>${l}</label></div><input class="f" data-pk="${k}" type="${t}" value="${esc(P[k]||'')}" ${t==='tel'?'inputmode="tel"':''}></div>`;
+  const inApp=/FBAN|FBAV|Instagram|WhatsApp|Line\/|wv\)|; wv/.test(navigator.userAgent);
+  app.innerHTML=`<div class="screen">
+   ${topbar(`<button class="circ" id="bk" aria-label="Back">${back}</button><div style="margin:0 auto;text-align:center"><h4>My profile</h4><small>Fills in every offer for you</small></div><span style="width:52px"></span>`)}
+   <div class="q"><div class="qh"><label>Company logo</label><span class="hint">shown on your offer letter</span></div>
+     ${PROFILE.logo?`<div class="logobox"><img src="${PROFILE.logo}" alt="logo"><label class="lbtn">Change<input type="file" id="pLogo" accept="image/*" hidden></label><button class="lbtn" id="pLogoRm">Remove</button></div>`
+       :`<label class="files logoup">🏷️<b>Upload your logo</b><small>PNG or JPG</small><input type="file" id="pLogo" accept="image/*" hidden></label>`}</div>
+   ${fld('cname','Your name')}${fld('company','Company')}
+   <div class="q"><div class="qh"><label>You are the</label></div><div class="chips">${['Seller','Seller mandate','Broker','Buyer-side broker'].map(o=>`<button class="chip ${P.role===o?'on':''}" data-pr="${o}">${o}</button>`).join('')}</div></div>
+   ${fld('phone','WhatsApp number','tel')}${fld('email','Email','email')}${fld('address','Company address')}${fld('website','Website')}
+   <button class="sbtn" style="background:#1B1B1B;color:#fff;margin-top:6px" id="pSave"><div>Save profile<small>Saved on this phone</small></div><span class="go">${arrow}</span></button>
+   <p class="tip">${inApp?'<b>⚠️ You opened this inside another app.</b> That browser may forget your profile. Open petromad.space in Safari or Chrome instead.<br><br>':''}<b>Tip:</b> in Safari tap <b>Share → Add to Home Screen</b>. The app gets its own icon and keeps your profile and offers.</p>
+   <button class="forget" id="pForget" style="margin:14px auto 0">Delete my profile from this phone</button>
+  </div>`;
+  const back2=()=>{view='home';render()};
+  $('#bk').onclick=back2;
+  app.querySelectorAll('[data-pk]').forEach(i=>i.oninput=()=>{ const v=i.value.trim(); if(v) P[i.dataset.pk]=v; else delete P[i.dataset.pk]; });
+  app.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{ P.role=P.role===b.dataset.pr?'':b.dataset.pr; if(!P.role) delete P.role; app.querySelectorAll('[data-pr]').forEach(x=>x.classList.toggle('on',x.dataset.pr===P.role)); });
+  const keep=()=>{ try{localStorage.setItem('oilProfile',JSON.stringify(PROFILE))}catch(e){toast('Could not save, the logo may be too large')} PKEYS.forEach(k=>{ if(S.cat){ if(P[k]) S.ans[k]=P[k]; else delete S.ans[k]; } }); };
+  $('#pSave').onclick=()=>{ keep(); try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){} toast('Profile saved ✓'); back2(); };
+  const li=$('#pLogo'); li.onchange=()=>{ const file=li.files[0]; if(!file) return; const img=new Image(); img.onload=()=>{ const k=Math.min(1,600/Math.max(img.width,img.height)), c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); PROFILE.logo=c.toDataURL('image/png'); keep(); render(); }; img.src=URL.createObjectURL(file); };
+  const lr=$('#pLogoRm'); if(lr) lr.onclick=()=>{ PROFILE.logo=''; keep(); render(); };
+  $('#pForget').onclick=()=>{ if(!confirm('Delete your saved profile and logo from this phone?')) return; PROFILE={ans:{},logo:''}; try{localStorage.removeItem('oilProfile')}catch(e){} PKEYS.forEach(k=>delete S.ans[k]); save(); try{localStorage.removeItem('oilProfile')}catch(e){} back2(); };
+}
 function renderHistory(app){
   $('#bar').hidden=true; const h=HIST();
   app.innerHTML=`<div class="screen">
@@ -798,7 +839,7 @@ function renderDone(app){
   $('#sWa').onclick=sendWa; $('#sShare').onclick=sharePdf; $('#again').onclick=()=>{S={cat:null,ans:{},files:[]};ref='';view='home';render()};
 }
 
-load(); loadLearned(); render();
+load(); loadLearned(); try{ if(PROFILE.ans.cname&&navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){} render();
 </script>
 </body>
 </html>
