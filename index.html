@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -258,6 +259,50 @@ textarea.f{min-height:90px;resize:vertical}
 #sheet .sig .line{margin-left:auto;width:200px;border-top:1.8px solid var(--tx);padding-top:8px;text-align:center;font-size:13.5px;color:var(--mut);flex:none}
 #sheet .ft{position:absolute;left:56px;right:56px;bottom:30px;display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut);border-top:1.5px solid var(--rule);padding-top:10px}
 #sheet.d-dark img{background:#fff;border-radius:10px;padding:6px}
+
+/* quality check + deal profit */
+.fl{display:block}.fl>span{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 4px 2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid2 input.f,.grid2 select.f,.lim input.f,.sch input.f{padding:11px 12px;font-size:15px}
+.setrow{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}.setrow>b{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--white);display:grid;place-items:center;flex:none;margin-top:10px;font-size:13px}
+details.q>summary,details.pcd>summary,details.prow>summary{list-style:none;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
+details.q>summary{margin:0}details.q[open]>summary{margin-bottom:12px}
+.pcd{background:var(--soft);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+.pcd>summary{display:flex;align-items:center;gap:8px}.pcd>summary b{font-size:15px}
+.pcd .pval{margin-left:auto;font-weight:700;font-size:14px;color:var(--muted)}
+.sfy{font-size:11px;font-weight:700;color:#fff;background:var(--red);border-radius:99px;padding:2px 8px}
+.lim{display:flex;gap:6px;align-items:center;margin-bottom:6px}.lim b{width:20px;text-align:center}.lim input{min-width:0;flex:1}
+.ck{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;margin-top:10px}.ck input{width:20px;height:20px;accent-color:var(--purple)}
+.rpt{background:var(--white);border-radius:var(--r-lg);padding:18px 16px;margin-top:14px}
+.rpth small{display:block;font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--muted)}.rpth b{display:block;font-size:22px;font-weight:800;line-height:1.15;margin:4px 0}.rpth span{font-size:12.5px;color:var(--muted)}
+.gate{border-radius:16px;padding:12px 14px;margin:14px 0;background:#22A04B22;border:1.5px solid #22A04B}.gate.hold{background:#D8483E1c;border-color:var(--red)}
+.gate b{display:block;font-size:17px}.gate span{font-size:13px}
+.vrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-weight:600;font-size:15px}.vrow>span:first-child{flex:1;min-width:0}
+.vrow small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;word-break:break-word}
+.bdg{color:#fff;font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;white-space:nowrap;flex:none}
+.ptab{margin-top:10px}
+.prow{border-top:1px solid var(--line);padding:10px 0}.prow>summary{display:flex;align-items:center;gap:10px}
+.prow>summary>span:first-child{flex:1;min-width:0}.prow b{display:block;font-size:15px}.prow small{display:block;font-size:12px;color:var(--muted)}
+.pr-v{text-align:right;font-weight:700;font-size:14px}
+.rh{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin:18px 0 6px}
+.fnd{display:flex;gap:10px;align-items:flex-start;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
+.fnd i{font-style:normal;color:#fff;font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:4px 8px;border-radius:6px;flex:none;margin-top:1px}
+.netc{border-radius:20px;padding:16px;margin:14px 0}.netc small{display:block;font-size:13px;font-weight:600;opacity:.8}.netc b{display:block;font-size:34px;font-weight:800;line-height:1.1}.netc span{font-size:13px}.netc em{display:block;font-size:12.5px;font-weight:700;margin-top:6px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpis>div{background:var(--soft);border-radius:14px;padding:12px}.kpis small{display:block;font-size:12px;color:var(--muted)}.kpis b{display:block;font-size:18px;font-weight:800}.kpis span{font-size:11.5px;color:var(--muted)}
+.ltab,.itab{width:100%;border-collapse:collapse;font-size:13.5px}
+.ltab td,.ltab th,.itab td,.itab th{padding:7px 4px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.ltab td:last-child,.ltab th:last-child{text-align:right;font-weight:700;white-space:nowrap}.ltab td:nth-child(2){color:var(--muted);font-size:12px}
+.ltab tr.sub td{font-weight:700}.ltab tr.tot td{font-weight:800;font-size:15px;border-top:2px solid var(--ink)}
+.itab{font-size:12px;margin:8px 0}.itab th{font-size:11px}
+.hint{font-size:13px;color:var(--muted)}
+.tg{font-style:normal;font-size:10px;font-weight:800;color:#E89B0C}
+.sctab{display:grid;gap:6px;overflow-x:auto}.sch{display:grid;grid-template-columns:88px repeat(5,minmax(52px,1fr));gap:4px;align-items:center;font-size:11px;font-weight:700;color:var(--muted)}
+.sch b{color:var(--ink);font-size:13px}.sch input.f{padding:8px 6px;font-size:13px;text-align:center}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
+.tool{border-radius:22px;padding:16px;text-align:left;color:#fff}.tool b{display:block;font-size:18px;font-weight:800;line-height:1.1;margin-top:8px}.tool small{display:block;font-size:12.5px;opacity:.85;margin-top:3px}.tool span{font-size:24px}
+.rpt-print{background:#fff!important;color:#1B1B1B!important}.rpt-print .nopr{display:none}.rpt-print .prow>summary{display:flex}
+@media (max-width:360px){.grid2,.kpis{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -266,6 +311,8 @@ textarea.f{min-height:90px;resize:vertical}
 <div id="sheet" aria-hidden="true"></div>
 <iframe name="fsframe" id="fsframe" style="display:none" title="send"></iframe>
 
+<script src="engine.js?v=20261017"></script>
+<script src="tools.js?v=20261017"></script>
 <script>
 /* ============================================================
    SETTINGS — change these two lines, then save.
@@ -451,6 +498,8 @@ function render(){
   if(view==='done') return renderDone(app);
   if(view==='history') return renderHistory(app);
   if(view==='profile') return renderProfile(app);
+  if(view==='quality') return renderQuality(app);
+  if(view==='deal') return renderDeal(app);
 }
 function topbar(left){
   return `<div class="top">${left}</div>`;
@@ -472,6 +521,8 @@ function renderHome(app){
    ${draft?`<button class="sbtn" style="background:#fff;margin-bottom:14px" id="resume"><div>Continue draft<small>${esc(cat().name)} offer in progress</small></div><span class="go">${arrow}</span></button>`:''}
 
    ${HIST().length?`<button class="sbtn" style="background:#1B1B1B;color:#fff;margin-bottom:14px" id="myOffers"><div>My offers<small>${HIST().length} saved · open again or reuse</small></div><span class="go">${arrow}</span></button>`:''}
+   <div class="tools"><button class="tool" id="goQuality" style="background:#1B1B1B"><span>🧪</span><b>Quality check</b><small>Spec vs lab certificate</small></button>
+     <button class="tool" id="goDeal" style="background:#6A4CF5"><span>📈</span><b>Deal profit</b><small>Net, break-even, scenarios</small></button></div>
    <div class="stack">${CATS.map(c=>`<button class="cat ${c.dark?'dark':''} ${c.bg==='#FFFFFF'?'light':''}" data-c="${c.id}" style="background:${c.bg};color:${c.fg}">
      <span class="ic">${c.icon}</span><span><b>${c.name}</b><span class="sub">${c.sub}</span></span><span class="go">${arrow}</span></button>`).join('')}</div>
   </div>`;
@@ -479,6 +530,8 @@ function renderHome(app){
   const r=$('#resume'); if(r) r.onclick=()=>{view='form';step=0;render()};
   const mo=$('#myOffers'); if(mo) mo.onclick=()=>{view='history';render()};
   $('#myProfile').onclick=()=>{view='profile';render()};
+  $('#goQuality').onclick=()=>{view='quality';render()};
+  $('#goDeal').onclick=()=>{view='deal';render()};
   $('#themeBtn').onclick=()=>{ const t=THEMES[(THEMES.indexOf(THEME)+1)%THEMES.length]; setTheme(t); toast({cream:'Cream mode',sky:'Sky mode',dark:'Dark mode'}[t],1400); };
 }
 
@@ -652,12 +705,15 @@ function renderReview(app){
        <button class="mini" id="sCopy"><b>⧉ Copy text</b><small>Paste anywhere</small></button>
        <button class="mini" id="sTxt"><b>💬 Plain text</b><small>To any WhatsApp chat</small></button>
        <button class="mini" id="sWa"><b>WhatsApp us</b><small>Text to our desk</small></button>
+       <button class="mini" id="sQual"><b>🧪 Quality check</b><small>This product vs spec</small></button>
+       <button class="mini" id="sDeal"><b>📈 Deal profit</b><small>Start from this offer</small></button>
      </div>
    </div></div>`;
   $('#bk').onclick=()=>{view='form';step=STAGES.length-1;render()};
   app.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{view='form';step=+b.dataset.edit;render()});
   $('#sEmail').onclick=sendEmail; $('#sShare').onclick=sharePdf; $('#sWa').onclick=sendWa; $('#sDl').onclick=downloadPdf; $('#sDoc').onclick=downloadDoc; $('#sCopy').onclick=copyText;
   $('#sJpg').onclick=downloadJpg; $('#sShareJ').onclick=shareJpg; $('#sTxt').onclick=shareText; $('#sPrev').onclick=previewDesign;
+  $('#sQual').onclick=qualityFromOffer; $('#sDeal').onclick=dealFromOffer;
   app.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ DESIGN=b.dataset.d; try{localStorage.setItem('oilDesign',DESIGN)}catch(e){} app.querySelectorAll('[data-d]').forEach(x=>x.classList.toggle('on',x===b)); });
   $('#bar').hidden=true;
 }
