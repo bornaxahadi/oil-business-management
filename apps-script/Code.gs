@@ -224,8 +224,11 @@ function company_(email, name, contact, role, ref) {
 function offers_() {
   const c = CacheService.getScriptCache(), hit = c.get('offers');
   if (hit) return JSON.parse(hit);
-  const r = UrlFetchApp.fetch(SETTINGS.offersUrl + '?t=' + Date.now(), {muteHttpExceptions: true});
-  const data = r.getResponseCode() === 200 ? JSON.parse(r.getContentText()) : {offers: []};
+  let data = {offers: []};
+  try {
+    const r = UrlFetchApp.fetch(SETTINGS.offersUrl + '?t=' + Date.now(), {muteHttpExceptions: true});
+    if (r.getResponseCode() === 200) data = JSON.parse(r.getContentText());
+  } catch (e) { return data; } // network or bad JSON: treat as no offers, don't cache
   c.put('offers', JSON.stringify(data), 60);
   return data;
 }
