@@ -6,19 +6,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Oil Offers">
+<meta name="apple-mobile-web-app-title" content="PETROMAD">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="shortcut icon" href="favicon.ico">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#1B1B1B">
-<meta name="theme-color" content="#EEEAE0">
+<meta name="theme-color" content="#070B14">
+<meta name="description" content="PETROMAD weekly physical petroleum cargo offers, buyer requests and supplier intake.">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Oil Offer Intake</title>
+<title>PETROMAD — Weekly cargo offers &amp; trading desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -304,6 +304,7 @@ details.q>summary{margin:0}details.q[open]>summary{margin-bottom:12px}
 .rpt-print{background:#fff!important;color:#1B1B1B!important}.rpt-print .nopr{display:none}.rpt-print .prow>summary{display:flex}
 @media (max-width:360px){.grid2,.kpis{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="theme.css?v=20261110">
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -313,6 +314,8 @@ details.q>summary{margin:0}details.q[open]>summary{margin-bottom:12px}
 
 <script src="engine.js?v=20261017"></script>
 <script src="tools.js?v=20261017"></script>
+<script src="platform.js?v=20261110"></script>
+<script src="market.js?v=20261110"></script>
 <script>
 /* ============================================================
    SETTINGS — change these two lines, then save.
@@ -328,13 +331,15 @@ const CONFIG = {
   receiverEmail: "ahadiborna@gmail.com",
   ccEmail: "",
   whatsappNumber: "971500000000",
-  brandName: "Oil Business Management"
+  brandName: "PETROMAD",
+  // Published weekly offers (approved structured records). Built with "Publish offer" and committed to the repo.
+  offersUrl: "offers.json"
 };
 
 /* ---------------- product catalogue ---------------- */
 const DK = "Don't know";
 const CATS = [
- {id:'crude', name:'Crude oil', sub:'Light, medium, heavy', icon:'🛢️', bg:'#1B1B1B', fg:'#fff', dark:true,
+ {id:'crude', name:'Crude oil', sub:'Light, medium, heavy', icon:'🛢️', bg:'#8B5E34', fg:'#fff', dark:true,
   fields:[
    {id:'grade',label:'Which crude grade?',type:'chips',other:true,options:['Brent','WTI','Murban','Dubai','Oman','Arab Light','Arab Medium','Arab Heavy','Basrah Medium','Basrah Heavy','Kirkuk','Kuwait Export','Upper Zakum','Urals','ESPO','CPC Blend','Azeri Light','Bonny Light','Qua Iboe','Es Sider']},
    {id:'region',label:'Which region?',type:'chips',options:['Middle East','Africa','Russia & CIS','North Sea / Europe','Americas','Asia-Pacific']},
@@ -342,7 +347,7 @@ const CATS = [
    {id:'sulphur',label:'Sweet or sour?',type:'chips',options:['Sweet (< 0.5% S)','Sour (> 0.5% S)']},
    {id:'api',label:'API gravity',hint:'number, if known',type:'text',input:'decimal'}
   ]},
- {id:'fuel', name:'Fuel oil', sub:'HSFO, VLSFO, M100, D6', icon:'⛽', bg:'#6A4CF5', fg:'#fff',
+ {id:'fuel', name:'Fuel oil', sub:'HSFO, VLSFO, M100, D6', icon:'⛽', bg:'#4F7CFF', fg:'#fff',
   fields:[
    {id:'grade',label:'What kind of fuel oil?',type:'chips',other:true,options:['HSFO 380 CST','HSFO 180 CST','VLSFO 0.5%','LSFO 1%','ULSFO 0.1%','Mazut M100','D6 virgin fuel oil']},
    {id:'sulphur',label:'Sulphur content',type:'chips',options:['3.5%','1%','0.5%','0.1%']},
@@ -350,18 +355,18 @@ const CATS = [
    {id:'condition',label:'Condition',type:'chips',options:['Virgin','Blended','Reprocessed']},
    {id:'viscosity',label:'Viscosity',hint:'cSt at 50°C',type:'text'}
   ]},
- {id:'diesel', name:'Diesel / Gasoil', sub:'EN590, Gasoil, D2, MGO', icon:'🚛', bg:'#FFC83D', fg:'#1B1B1B',
+ {id:'diesel', name:'Diesel / Gasoil', sub:'EN590, Gasoil, D2, MGO', icon:'🚛', bg:'#E8A33D', fg:'#1B1B1B',
   fields:[
    {id:'grade',label:'What kind of diesel?',type:'chips',other:true,options:['EN590 10 ppm','EN590 50 ppm','Gasoil 0.1% (1,000 ppm)','Gasoil 0.2% (L-0.2-62)','Gasoil 0.5%','D2 diesel (GOST 305-82)','Marine gasoil (MGO)']},
    {id:'colour',label:'Colour',type:'chips',swatch:true,options:['Clear & bright','Pale yellow','Red dyed','Green dyed']},
    {id:'condition',label:'Condition',type:'chips',options:['Refinery fresh','Blended']}
   ]},
- {id:'petrol', name:'Petrol / Gasoline', sub:'RON 92, 95, 98, naphtha', icon:'🚗', bg:'#D8483E', fg:'#fff',
+ {id:'petrol', name:'Petrol / Gasoline', sub:'RON 92, 95, 98, naphtha', icon:'🚗', bg:'#E0614F', fg:'#fff',
   fields:[
    {id:'grade',label:'What kind of petrol?',type:'chips',other:true,options:['RON 92','RON 95','RON 98','AI-92','AI-95','Premium unleaded','Naphtha']},
    {id:'colour',label:'Colour',type:'chips',swatch:true,options:['Clear','Pale yellow','Orange','Blue dyed']}
   ]},
- {id:'baseoil', name:'Base oil', sub:'SN150, SN500, Group II/III', icon:'🧴', bg:'#CDD97A', fg:'#1B1B1B',
+ {id:'baseoil', name:'Base oil', sub:'SN150, SN500, Group II/III', icon:'🧴', bg:'#3FB68B', fg:'#1B1B1B',
   fields:[
    {id:'group',label:'API group',type:'chips',options:['Group I','Group II','Group III']},
    {id:'grade',label:'What kind of base oil?',type:'chips',other:true,options:['SN150','SN350','SN500','Bright stock 150','70N','150N','500N','600N','4 cSt','6 cSt','8 cSt']},
@@ -369,27 +374,27 @@ const CATS = [
    {id:'condition',label:'Virgin or recycled?',type:'chips',options:['Virgin','Re-refined']},
    {id:'packing',label:'Packing',type:'multi',options:['Bulk','Flexitank','Drums','IBC']}
   ]},
- {id:'condensate', name:'Condensate', sub:'Gas condensate, light naphtha', icon:'💧', bg:'#FFFFFF', fg:'#1B1B1B',
+ {id:'condensate', name:'Condensate', sub:'Gas condensate, light naphtha', icon:'💧', bg:'#7FA7C9', fg:'#1B1B1B',
   fields:[
    {id:'grade',label:'What kind of condensate?',type:'chips',other:true,options:['Gas condensate','Deodorized field condensate','Low-sulphur condensate','Natural gasoline','Light naphtha']},
    {id:'api',label:'API gravity',hint:'number, if known',type:'text',input:'decimal'},
    {id:'colour',label:'Colour',type:'chips',swatch:true,options:['Clear','Straw yellow','Light brown']}
   ]},
- {id:'jet', name:'Jet fuel', sub:'Jet A-1, TS-1, kerosene', icon:'✈️', bg:'#6A4CF5', fg:'#fff',
+ {id:'jet', name:'Jet fuel', sub:'Jet A-1, TS-1, kerosene', icon:'✈️', bg:'#4F7CFF', fg:'#fff',
   fields:[
    {id:'grade',label:'What kind of jet fuel?',type:'chips',other:true,options:['Jet A-1','Jet A','TS-1','Kerosene']},
    {id:'colour',label:'Colour',type:'chips',swatch:true,options:['Clear & bright','Straw']}
   ]},
- {id:'lpg', name:'LPG / LNG', sub:'Propane, butane, LNG', icon:'🔥', bg:'#FFC83D', fg:'#1B1B1B',
+ {id:'lpg', name:'LPG / LNG', sub:'Propane, butane, LNG', icon:'🔥', bg:'#E8A33D', fg:'#1B1B1B',
   fields:[
    {id:'grade',label:'Which gas?',type:'chips',other:true,options:['Propane','Butane','LPG mix 50/50','LPG mix 60/40','LNG']}
   ]},
- {id:'bitumen', name:'Bitumen', sub:'60/70, 80/100, VG-30', icon:'🛣️', bg:'#1B1B1B', fg:'#fff', dark:true,
+ {id:'bitumen', name:'Bitumen', sub:'60/70, 80/100, VG-30', icon:'🛣️', bg:'#8B5E34', fg:'#fff', dark:true,
   fields:[
    {id:'grade',label:'What grade?',type:'chips',other:true,options:['60/70','80/100','40/50','VG-30','VG-40','Emulsion']},
    {id:'packing',label:'Packing',type:'multi',options:['Bulk','Drums','Jumbo bags']}
   ]},
- {id:'other', name:'Something else', sub:'Type the product name', icon:'➕', bg:'#D8483E', fg:'#fff',
+ {id:'other', name:'Something else', sub:'Type the product name', icon:'➕', bg:'#E0614F', fg:'#fff',
   fields:[
    {id:'grade',label:'Product name',type:'text',required:true}
   ]}
@@ -399,15 +404,15 @@ const INCOTERMS=['FOB','CIF','CFR','DAP','TTT','TTO','Ex-tank','EXW'];
 
 /* ---------------- stages ---------------- */
 const STAGES = [
- {key:'product', title:'The product', text:'Pick what the seller is offering. Tap “Don’t know” for anything they didn’t say.', bg:'#6A4CF5', fg:'#fff'},
- {key:'origin', title:'Origin & owner', text:'Where it was made and who really holds it.', bg:'#D8483E', fg:'#fff',
+ {key:'product', title:'The product', text:'Pick what the seller is offering. Tap “Don’t know” for anything they didn’t say.', bg:'#4F7CFF', fg:'#fff'},
+ {key:'origin', title:'Origin & owner', text:'Where it was made and who really holds it.', bg:'#E0614F', fg:'#fff',
   fields:[
    {id:'origin',label:'Country of origin',type:'chips',other:true,options:['UAE','Saudi Arabia','Iraq','Oman','Kuwait','Qatar','Russia','Kazakhstan','Azerbaijan','Nigeria','Angola','Libya','Malaysia','India','USA']},
    {id:'refinery',label:'Refinery name',type:'text'},
    {id:'owner',label:'Product owner (company)',type:'text'},
    {id:'position',label:'Seller position',hint:'who is offering',type:'chips',options:['Refinery direct','Product owner','Seller mandate','Broker','Broker chain']}
   ]},
- {key:'location', title:'Quantity & location', text:'How much, and where the product sits right now.', bg:'#FFC83D', fg:'#1B1B1B',
+ {key:'location', title:'Quantity & location', text:'How much, and where the product sits right now.', bg:'#E8A33D', fg:'#1B1B1B',
   fields:[
    {id:'where',label:'Where is the product?',type:'chips',options:['On a vessel','In a storage tank','At the refinery','Not produced yet (contract)']},
    {id:'vessel',label:'Vessel name',type:'text',showIf:s=>s.where==='On a vessel'},
@@ -420,7 +425,7 @@ const STAGES = [
    {id:'contract',label:'Type of deal',type:'chips',options:['Spot cargo','Trial lift + contract','12-month contract']},
    {id:'monthly',label:'Monthly quantity',type:'qty',showIf:s=>/contract/.test(s.contract||'')}
   ]},
- {key:'price', title:'Price & terms', text:'Choose every delivery term offered and add the price for each.', bg:'#1B1B1B', fg:'#fff', dark:true,
+ {key:'price', title:'Price & terms', text:'Choose every delivery term offered and add the price for each.', bg:'#8B5E34', fg:'#fff', dark:true,
   fields:[
    {id:'terms',label:'Delivery terms',type:'multi',options:INCOTERMS},
    {id:'prices',label:'Price for each term',type:'prices',showIf:s=>Array.isArray(s.terms)&&s.terms.length},
@@ -436,13 +441,13 @@ const STAGES = [
    {id:'procedure',label:'Procedure',type:'multi',options:['Dip test','SGS Q&Q','Tank storage agreement','Injection','Vessel inspection']},
    {id:'validity',label:'Offer valid until',type:'date'}
   ]},
- {key:'docs', title:'Documents & files', text:'Tick what the seller can show, then attach the spec and any files.', bg:'#CDD97A', fg:'#1B1B1B',
+ {key:'docs', title:'Documents & files', text:'Tick what the seller can show, then attach the spec and any files.', bg:'#3FB68B', fg:'#1B1B1B',
   fields:[
    {id:'documents',label:'Documents the seller has',type:'multi',options:['SGS / Q&Q report','Certificate of quality','Certificate of origin','Commercial invoice','Bill of lading','Q88 (vessel)','Tank storage receipt','Dip test authorization','Product passport','Refinery commitment letter','FCO / offer letter','SPA draft']},
    {id:'files',label:'Attach documents & product photos',hint:'photos of the product sample, tank or vessel help a lot',type:'files'},
    {id:'spec',label:'Key spec values',hint:'density, sulphur, flash point…',type:'textarea'}
   ]},
- {key:'contact', title:'Your details', text:'They go on an official offer letter, and are saved on this phone for next time.', bg:'#6A4CF5', fg:'#fff',
+ {key:'contact', title:'Your details', text:'They go on an official offer letter, and are saved on this phone for next time.', bg:'#4F7CFF', fg:'#fff',
   fields:[
    {id:'logo',label:'Company logo',hint:'optional · shown on your offer letter',type:'logo',noDK:true},
    {id:'cname',label:'Your name',type:'text',required:true,noDK:true},
@@ -461,8 +466,8 @@ let S = {cat:null, ans:{}, files:[]};
 let view = 'home', step = 0, ref = '';
 const $ = s=>document.querySelector(s);
 const MAXF = 6;
-const THEMES=['cream','sky','dark']; let THEME=localStorage.getItem('oilTheme')||'cream';
-function setTheme(t){ THEME=t; document.documentElement.dataset.theme=t; try{localStorage.setItem('oilTheme',t)}catch(e){} }
+const THEMES=['night','day']; let THEME=(()=>{ try{ const t=localStorage.getItem('pmTheme'); if(t==='day'||t==='night') return t; }catch(e){} return 'night'; })();
+function setTheme(t){ THEME=t; document.documentElement.dataset.theme=t; const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=t==='day'?'#F4F6F9':'#070B14'; try{localStorage.setItem('pmTheme',t)}catch(e){} }
 setTheme(THEME);
 let DESIGN=localStorage.getItem('oilDesign')||'colour';
 const DESIGNS=[['colour','Colour','#EEEAE0'],['letter','Letterhead','#FFFFFF'],['dark','Dark','#111111']];
@@ -500,41 +505,19 @@ function render(){
   if(view==='profile') return renderProfile(app);
   if(view==='quality') return renderQuality(app);
   if(view==='deal') return renderDeal(app);
+  if(view==='sell') return renderSell(app);
+  if(view==='offer') return renderOffer(app);
+  if(view==='buy') return renderBuy(app);
+  if(view==='buyreview') return renderBuyReview(app);
+  if(view==='buydone') return renderBuyDone(app);
+  if(view==='how') return renderHow(app);
+  if(view==='track') return renderTrack(app);
+  if(view==='publish') return renderPublish(app);
 }
 function topbar(left){
   return `<div class="top">${left}</div>`;
 }
-function renderHome(app){
-  $('#bar').hidden=true;
-  const draft = S.cat && Object.keys(S.ans).length;
-  app.innerHTML = `<div class="screen">
-   ${topbar(`<div class="mark">${drop}</div><div><h4>${esc(CONFIG.brandName)}</h4><small>Offer intake</small></div><button class="circ ml" id="themeBtn" aria-label="Colour mode" title="Colour mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 000 18z" fill="currentColor"/></svg></button>`)}
-   <h1 class="hero">NEW OIL<br>OFFER</h1>
-   <p class="lede">Choose the product being offered. It takes about two minutes.</p>
-   <div class="perks"><span>✓ Mostly tick boxes</span><span>✓ "Don't know" is fine</span><span>✓ Attach PDF &amp; photos</span></div>
-   ${(()=>{ const P=PROFILE.ans, has=!!(P.cname||P.company), ini=esc(((P.company||P.cname||'?').trim()[0]||'?').toUpperCase());
-     return `<button class="pcard ${has?'':'empty'}" id="myProfile" aria-label="My profile">
-       <span class="pav">${PROFILE.logo?`<img src="${PROFILE.logo}" alt="">`:(has?ini:'+')}</span>
-       <span class="pinfo"><small>${has?'MY PROFILE':'NEW HERE?'}</small><b>${has?esc(P.company||P.cname):'Create your profile'}</b>
-       <span>${has?esc([P.company?P.cname:'',P.role,P.phone].filter(Boolean).join(' · ')||'Tap to add your details'):'Save your name, company &amp; logo once. Every offer fills itself in.'}</span></span>
-       <span class="pedit">${has?'Edit':'Start'}</span></button>`; })()}
-   ${draft?`<button class="sbtn" style="background:#fff;margin-bottom:14px" id="resume"><div>Continue draft<small>${esc(cat().name)} offer in progress</small></div><span class="go">${arrow}</span></button>`:''}
-
-   ${HIST().length?`<button class="sbtn" style="background:#1B1B1B;color:#fff;margin-bottom:14px" id="myOffers"><div>My offers<small>${HIST().length} saved · open again or reuse</small></div><span class="go">${arrow}</span></button>`:''}
-   <div class="tools"><button class="tool" id="goQuality" style="background:#1B1B1B"><span>🧪</span><b>Quality check</b><small>Spec vs lab certificate</small></button>
-     <button class="tool" id="goDeal" style="background:#6A4CF5"><span>📈</span><b>Deal profit</b><small>Net, break-even, scenarios</small></button></div>
-   <div class="stack">${CATS.map(c=>`<button class="cat ${c.dark?'dark':''} ${c.bg==='#FFFFFF'?'light':''}" data-c="${c.id}" style="background:${c.bg};color:${c.fg}">
-     <span class="ic">${c.icon}</span><span><b>${c.name}</b><span class="sub">${c.sub}</span></span><span class="go">${arrow}</span></button>`).join('')}</div>
-  </div>`;
-  app.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{ if(S.cat!==b.dataset.c){S={cat:b.dataset.c,ans:{currency:'USD',per:'MT',...PROFILE.ans},files:[]}} view='form';step=0;save();render(); });
-  const r=$('#resume'); if(r) r.onclick=()=>{view='form';step=0;render()};
-  const mo=$('#myOffers'); if(mo) mo.onclick=()=>{view='history';render()};
-  $('#myProfile').onclick=()=>{view='profile';render()};
-  $('#goQuality').onclick=()=>{view='quality';render()};
-  $('#goDeal').onclick=()=>{view='deal';render()};
-  $('#themeBtn').onclick=()=>{ const t=THEMES[(THEMES.indexOf(THEME)+1)%THEMES.length]; setTheme(t); toast({cream:'Cream mode',sky:'Sky mode',dark:'Dark mode'}[t],1400); };
-}
-
+/* renderHome / renderSell live in market.js */
 const fillProfile=()=>{ PKEYS.forEach(k=>{ if(!(k in S.ans) && PROFILE.ans[k]) S.ans[k]=PROFILE.ans[k]; }); };
 function renderForm(app){
   fillProfile();
@@ -542,19 +525,19 @@ function renderForm(app){
   const color = step===0 ? {bg:c.bg,fg:c.fg,dark:c.dark} : st;
   app.innerHTML = `<div class="screen">
    ${topbar(`<button class="circ" id="bk" aria-label="Back">${back}</button><div style="margin:0 auto;text-align:center"><h4>${esc(c.name)} offer</h4><small>Stage ${step+1} of ${STAGES.length}</small></div><button class="circ" id="hm" aria-label="Start over" title="Start over"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/></svg></button>`)}
-   <div class="prog">${STAGES.map((_,i)=>`<i class="${i<=step?'on':''}"></i>`).join('')}</div>
-   <div class="stagecard ${color.dark?'dark':''}" style="background:${color.bg};color:${color.fg};${color.bg==='#FFFFFF'?'border:1.5px solid var(--line)':''}">
-     <span class="pill">Stage ${step+1}</span><h2>${st.title}</h2><p>${st.text}</p></div>
+   <div class="prog">${STAGES.map((st,i)=>`<span class="${i<=step?'on':''}"><i></i>${({product:'Product',origin:'Origin',location:'Quantity',price:'Price',docs:'Docs',contact:'Contact'})[st.key]||''}</span>`).join('')}</div>
+   <div class="stagecard" style="--acc:${color.bg}">
+     <span class="pill mono">SELL · STAGE ${step+1}/${STAGES.length}</span><h2>${st.title}</h2><p>${st.text}</p></div>
    <div id="qs"></div><div class="err" id="err"></div>
   </div>`;
   drawQs();
-  $('#bk').onclick=()=>{ if(step===0){view='home'} else step--; render(); };
-  $('#hm').onclick=()=>{ if(confirm('Start a new offer? This clears the current answers.')){S={cat:null,ans:{},files:[]};save();view='home';render()} };
-  bar([{t:back,ghost:true,fn:()=>{ if(step===0){view='home'} else step--; render(); }},{t:step===STAGES.length-1?'Review offer':'Next',fn:next}]);
+  $('#bk').onclick=()=>{ if(step===0){view='sell'} else step--; render(); };
+  $('#hm').onclick=()=>{ if(confirm('Start a new offer? This clears the current answers.')){S={cat:null,ans:{},files:[]};save();view='sell';render()} };
+  bar([{t:back,ghost:true,fn:()=>{ if(step===0){view='sell'} else step--; render(); }},{t:step===STAGES.length-1?'Review offer':'Next',fn:next}]);
 }
 function bar(btns){
   $('#bar').hidden=false;
-  $('#barin').innerHTML = btns.map((b,i)=>`<button class="btn ${b.ghost?'ghost':''}" data-i="${i}" aria-label="${b.ghost?'Back':esc(b.t)}">${b.t}</button>`).join('');
+  $('#barin').innerHTML = btns.map((b,i)=>{ const svg=/^\s*<svg/.test(b.t); const lab=b.label||(svg?(b.ghost?'Back':'Action'):b.t.replace(/<[^>]+>/g,'')); return `<button class="btn ${b.ghost?'ghost':''} ${b.wide?'wide':''}" data-i="${i}" aria-label="${esc(lab)}">${b.t}</button>`; }).join('');
   $('#barin').querySelectorAll('button').forEach(el=>el.onclick=btns[+el.dataset.i].fn);
 }
 function next(){
@@ -693,11 +676,11 @@ function renderReview(app){
    ${sections().map(s=>`<div class="sum"><h3><i style="width:12px;height:12px;border-radius:50%;background:${s.bg};border:1px solid #0002;margin-right:8px;display:inline-block"></i>${s.title}<button data-edit="${s.i}">Edit</button></h3>
      <dl class="kv">${s.rows.map(r=>`<dt>${esc(r.k)}</dt><dd class="${!r.v||r.v===DK?'u':''}">${esc(r.v||'—')}</dd>`).join('')}</dl></div>`).join('')}
    <div class="send">
-     <button class="sbtn" style="background:#6A4CF5;color:#fff" id="sEmail"><div>Send offer<small>To our desk by email, with PDF and files</small></div><span class="go">${arrow}</span></button>
+     <button class="sbtn primary" id="sEmail"><div>Send offer<small>To our desk by email, with PDF and files</small></div><span class="go">${arrow}</span></button>
      <div class="dpick"><div class="dph"><b>Design of your offer file</b><button id="sPrev">👁 Preview</button></div>
        <div class="dopts">${DESIGNS.map(([k,n,c])=>`<button class="dopt ${DESIGN===k?'on':''}" data-d="${k}"><i style="background:${c}"><em style="background:${k==='letter'?'#1B1B1B':cat().bg}"></em><u></u><u></u></i>${n}</button>`).join('')}</div></div>
-     <button class="sbtn" style="background:#CDD97A;color:#1B1B1B" id="sShare"><div>Share PDF<small>WhatsApp, email, Telegram, AirDrop…</small></div><span class="go">${arrow}</span></button>
-     <button class="sbtn" style="background:#FFC83D;color:#1B1B1B" id="sShareJ"><div>Share as picture (JPG)<small>Best for WhatsApp chats and status</small></div><span class="go">${arrow}</span></button>
+     <button class="sbtn" id="sShare"><div>Share PDF<small>WhatsApp, email, Telegram, AirDrop…</small></div><span class="go">${arrow}</span></button>
+     <button class="sbtn" id="sShareJ"><div>Share as picture (JPG)<small>Best for WhatsApp chats and status</small></div><span class="go">${arrow}</span></button>
      <div class="minis">
        <button class="mini" id="sDl"><b>⬇︎ PDF</b><small>Download</small></button>
        <button class="mini" id="sJpg"><b>⬇︎ JPG</b><small>Download picture</small></button>
@@ -893,11 +876,11 @@ function renderProfile(app){
    ${fld('cname','Your name')}${fld('company','Company')}
    <div class="q"><div class="qh"><label>You are the</label></div><div class="chips">${['Seller','Seller mandate','Broker','Buyer-side broker'].map(o=>`<button class="chip ${P.role===o?'on':''}" data-pr="${o}">${o}</button>`).join('')}</div></div>
    ${fld('phone','WhatsApp number','tel')}${fld('email','Email','email')}${fld('address','Company address')}${fld('website','Website')}
-   <button class="sbtn" style="background:#1B1B1B;color:#fff;margin-top:6px" id="pSave"><div>Save profile<small>Saved on this phone</small></div><span class="go">${arrow}</span></button>
+   <button class="sbtn primary" style="margin-top:6px" id="pSave"><div>Save profile<small>Saved on this phone</small></div><span class="go">${arrow}</span></button>
    <p class="tip">${inApp?'<b>⚠️ You opened this inside another app.</b> That browser may forget your profile. Open petromad.space in Safari or Chrome instead.<br><br>':''}<b>Tip:</b> in Safari tap <b>Share → Add to Home Screen</b>. The app gets its own icon and keeps your profile and offers.</p>
    <button class="forget" id="pForget" style="margin:14px auto 0">Delete my profile from this phone</button>
   </div>`;
-  const back2=()=>{view='home';render()};
+  const back2=()=>{view='sell';render()};
   $('#bk').onclick=back2;
   app.querySelectorAll('[data-pk]').forEach(i=>i.oninput=()=>{ const v=i.value.trim(); if(v) P[i.dataset.pk]=v; else delete P[i.dataset.pk]; });
   app.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{ P.role=P.role===b.dataset.pr?'':b.dataset.pr; if(!P.role) delete P.role; app.querySelectorAll('[data-pr]').forEach(x=>x.classList.toggle('on',x.dataset.pr===P.role)); });
@@ -916,7 +899,7 @@ function renderHistory(app){
      <div class="hb"><button data-open="${i}">Open</button><button data-copy="${i}">Reuse</button><button data-del="${i}" aria-label="Delete">✕</button></div></div>`}).join('')
    :`<p class="lede">Offers you send, download or share will appear here, so you can open them again or reuse them for a new offer.</p>`}
   </div>`;
-  $('#bk').onclick=()=>{view='home';render()};
+  $('#bk').onclick=()=>{view='sell';render()};
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const x=h[+b.dataset.open]; S={cat:x.cat,ans:JSON.parse(JSON.stringify(x.ans)),files:[]}; ref=x.ref; view='review'; render();});
   app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{const x=h[+b.dataset.copy]; S={cat:x.cat,ans:{...JSON.parse(JSON.stringify(x.ans)),...PROFILE.ans},files:[]}; ref=''; view='form'; step=0; save(); render(); toast('Copied, update anything that changed');});
   app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ if(!confirm('Delete this saved offer?')) return; const all=HIST(); all.splice(+b.dataset.del,1); localStorage.setItem('oilHistory',JSON.stringify(all)); render(); });
@@ -991,15 +974,15 @@ function sendFormSubmit(pdf){
 function renderDone(app){
   $('#bar').hidden=true;
   app.innerHTML=`<div class="screen done">
-   <div class="big">✓</div><h1 class="hero" style="font-size:40px">OFFER SENT</h1>
+   <div class="big">✓</div><h1 class="hero">Offer received</h1>
    <p class="lede" style="margin:8px auto 24px">Reference ${ref}. We’ll reply on WhatsApp or email after checking the details.</p>
-   <div class="send"><button class="sbtn" style="background:#CDD97A" id="sShare"><div>Share your PDF<small>Keep a copy or send it to others</small></div><span class="go">${arrow}</span></button>
-   <button class="sbtn" style="background:#FFC83D" id="sWa"><div>Also send on WhatsApp<small>Summary to our desk</small></div><span class="go">${arrow}</span></button>
-   <button class="sbtn" style="background:#1B1B1B;color:#fff" id="again"><div>Send another offer</div><span class="go">${arrow}</span></button></div></div>`;
-  $('#sWa').onclick=sendWa; $('#sShare').onclick=sharePdf; $('#again').onclick=()=>{S={cat:null,ans:{},files:[]};ref='';view='home';render()};
+   <div class="send"><button class="sbtn primary" id="sShare"><div>Share your PDF<small>Keep a copy or send it to others</small></div><span class="go">${arrow}</span></button>
+   <button class="sbtn" id="sWa"><div>Also send on WhatsApp<small>Summary to our desk</small></div><span class="go">${arrow}</span></button>
+   <button class="sbtn" id="again"><div>Send another offer</div><span class="go">${arrow}</span></button></div></div>`;
+  $('#sWa').onclick=sendWa; $('#sShare').onclick=sharePdf; $('#again').onclick=()=>{S={cat:null,ans:{},files:[]};ref='';view='sell';render()};
 }
 
-load(); loadLearned(); try{ if(PROFILE.ans.cname&&navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){} render();
+load(); loadLearned(); try{ if(PROFILE.ans.cname&&navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){} route();
 </script>
 </body>
 </html>

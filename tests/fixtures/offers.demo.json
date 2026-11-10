@@ -1,0 +1,47 @@
+{
+  "entity": "PETROMAD (demo entity)",
+  "note": "DEMONSTRATION DATA ONLY - not real cargoes. Used by tests and screenshots.",
+  "offers": [
+    {"id": "PM-2026-W46-001", "status": "ACTIVE", "versions": [
+      {"version": 1, "issuedUtc": "2026-11-09T06:00:00Z", "classification": "Indicative", "sellerPosition": "Authorised supplier",
+       "product": {"family": "Middle distillates", "grade": "DEMO Jet A-1", "origin": "UAE", "standard": "DEF STAN 91-091 / AFQRJOS", "annex": "Annex 1 - Spec v1", "coaDate": "2026-11-05", "samplePoint": "Shore tank composite"},
+       "quantity": {"min": 2500, "max": 4000, "unit": "MT", "tolerancePct": 5, "optionHolder": "Seller"},
+       "location": {"status": "In tank", "country": "UAE", "port": "Fujairah", "releasePoint": "Terminal T-7 manifold"},
+       "delivery": {"term": "FOB", "place": "Fujairah", "laycanFrom": "2026-11-18", "laycanTo": "2026-11-22"},
+       "pricing": {"basis": "Formula", "benchmark": "Platts Jet Kero FOB AG", "window": "5 quotes after B/L", "differential": "+18", "currency": "USD", "unit": "MT", "public": false, "disclosure": "Verified buyers only"},
+       "payment": {"instruments": ["LC", "SBLC"], "documents": "3/3 B/L, COQ, COO within 5 banking days"},
+       "inspection": {"appointedBy": "Mutually agreed independent inspector", "points": "Shore tank and vessel tanks", "costs": "50/50"},
+       "marine": {"nomination": "Buyer nominates vessel 5 days before laycan; Q88 for seller approval", "demurrage": "As per charter party"},
+       "procedure": ["Enquiry and KYB", "Specification confirmation", "SPA signature", "Payment instrument", "Vessel nomination", "Inspection and loading", "Documents and settlement"],
+       "legal": {"validity": "7 days", "confidentiality": "Confidential to the recipient"},
+       "spec": [{"param": "Freezing point", "unit": "°C", "method": "ASTM D5972", "max": "-47", "result": "-52", "sourceDate": "2026-11-05", "samplePoint": "Shore tank composite", "lab": "Demo Lab", "precedence": 1},
+                {"param": "Flash point", "unit": "°C", "method": "IP 170", "min": "38", "result": "42", "sourceDate": "2026-11-05", "samplePoint": "Shore tank composite", "lab": "Demo Lab", "precedence": 1}],
+       "attachments": [{"label": "Spec Annex 1", "url": "#", "public": true}, {"label": "Title documents", "url": "#", "public": false}],
+       "gated": ["location.releasePoint"],
+       "approval": {"draftedBy": "Demo drafter", "checkedBy": "Demo trader", "approvedBy": "Demo manager", "approvedUtc": "2026-11-09T05:30:00Z", "checks": {"supply": true, "entitlement": true, "delivery": true, "confidential": true}}},
+      {"version": 2, "replaces": 1, "issuedUtc": "2026-11-10T06:00:00Z", "classification": "Indicative", "sellerPosition": "Authorised supplier",
+       "product": {"family": "Middle distillates", "grade": "DEMO Jet A-1", "origin": "UAE", "standard": "DEF STAN 91-091 / AFQRJOS", "annex": "Annex 1 - Spec v2", "coaDate": "2026-11-08", "samplePoint": "Shore tank composite"},
+       "quantity": {"min": 3000, "max": 4000, "unit": "MT", "tolerancePct": 5, "optionHolder": "Seller"},
+       "location": {"status": "In tank", "country": "UAE", "port": "Fujairah", "releasePoint": "Terminal T-7 manifold"},
+       "delivery": {"term": "FOB", "place": "Fujairah", "laycanFrom": "2026-11-20", "laycanTo": "2026-11-24"},
+       "pricing": {"basis": "Formula", "benchmark": "Platts Jet Kero FOB AG", "window": "5 quotes after B/L", "differential": "+16", "currency": "USD", "unit": "MT", "public": false, "disclosure": "Verified buyers only"},
+       "payment": {"instruments": ["LC", "SBLC"], "documents": "3/3 B/L, COQ, COO within 5 banking days"},
+       "inspection": {"appointedBy": "Mutually agreed independent inspector", "points": "Shore tank and vessel tanks", "costs": "50/50"},
+       "marine": {"nomination": "Buyer nominates vessel 5 days before laycan; Q88 for seller approval", "demurrage": "As per charter party"},
+       "procedure": ["Enquiry and KYB", "Specification confirmation", "SPA signature", "Payment instrument", "Vessel nomination", "Inspection and loading", "Documents and settlement"],
+       "legal": {"validity": "7 days", "confidentiality": "Confidential to the recipient"},
+       "spec": [{"param": "Freezing point", "unit": "°C", "method": "ASTM D5972", "max": "-47", "result": "-51", "sourceDate": "2026-11-08", "samplePoint": "Shore tank composite", "lab": "Demo Lab", "precedence": 1},
+                {"param": "Flash point", "unit": "°C", "method": "IP 170", "min": "38", "result": "43", "sourceDate": "2026-11-08", "samplePoint": "Shore tank composite", "lab": "Demo Lab", "precedence": 1}],
+       "attachments": [{"label": "Spec Annex 1", "url": "#", "public": true}, {"label": "Title documents", "url": "#", "public": false}],
+       "gated": ["location.releasePoint"],
+       "approval": {"draftedBy": "Demo drafter", "checkedBy": "Demo trader", "approvedBy": "Demo manager", "approvedUtc": "2026-11-10T05:30:00Z", "checks": {"supply": true, "entitlement": true, "delivery": true, "confidential": true}}}
+    ]},
+    {"id": "PM-2026-W44-002", "status": "ACTIVE", "versions": [
+      {"version": 1, "issuedUtc": "2026-10-27T06:00:00Z", "classification": "Indicative", "sellerPosition": "Reseller",
+       "product": {"family": "Middle distillates", "grade": "DEMO EN 590 10 ppm", "origin": "Netherlands"},
+       "quantity": {"min": 5000, "max": 10000, "unit": "MT"}, "location": {"status": "In tank", "country": "Netherlands", "port": "Rotterdam"},
+       "delivery": {"term": "CIF", "place": "Genoa"}, "pricing": {"basis": "Fixed", "fixed": "720", "currency": "USD", "unit": "MT", "public": true},
+       "approval": {"draftedBy": "Demo", "checkedBy": "Demo", "approvedBy": "Demo", "approvedUtc": "2026-10-27T05:00:00Z", "checks": {"supply": true, "entitlement": true, "delivery": true, "confidential": true}}}
+    ]}
+  ]
+}
