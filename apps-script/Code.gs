@@ -222,14 +222,18 @@ function company_(email, name, contact, role, ref) {
 }
 
 function offers_() {
-  const c = CacheService.getScriptCache(), hit = c.get('offers');
-  if (hit) return JSON.parse(hit);
+  let c = null;
+  try {
+    c = CacheService.getScriptCache();
+    const hit = c.get('offers');
+    if (hit) return JSON.parse(hit);
+  } catch (e) { c = null; } // cache unavailable or corrupt entry: fetch fresh
   let data = {offers: []};
   try {
     const r = UrlFetchApp.fetch(SETTINGS.offersUrl + '?t=' + Date.now(), {muteHttpExceptions: true});
     if (r.getResponseCode() === 200) data = JSON.parse(r.getContentText());
   } catch (e) { return data; } // network or bad JSON: treat as no offers, don't cache
-  c.put('offers', JSON.stringify(data), 60);
+  try { if (c) c.put('offers', JSON.stringify(data), 60); } catch (e) {} // caching is best-effort
   return data;
 }
 
